@@ -33,6 +33,7 @@ public class Battleship extends Ship {
 	@Override
 	public void Upgrade() {
 		JOptionPane.showMessageDialog(_location, "This ship can not be upgraded any further!");
+		this._upgrading = false;
 	}
 
 }

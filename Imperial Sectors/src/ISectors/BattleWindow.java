@@ -40,8 +40,10 @@ public class BattleWindow extends JFrame implements ActionListener {
 		
 		JMenuItem itmNewGame = new JMenuItem("New Game");
 		JMenuItem itmExit = new JMenuItem("Exit");
+		JMenuItem itmDebug = new JMenuItem("Debug");
 		fileMenu.add(itmNewGame);
 		fileMenu.add(itmExit);
+		OptionMenu.add(itmDebug);
 		
 		itmNewGame.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -55,7 +57,60 @@ public class BattleWindow extends JFrame implements ActionListener {
 			}
 		});
 		
+		itmDebug.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				//Setup debug dialog.
+			}
+		});
+		
 		pack();
+	}
+	
+	
+	private void generateDebugDialog() {
+		JDialog dbgDialog = new JDialog(this, "Debug");
+		dbgDialog.setSize(200, 80);
+		dbgDialog.setModal(true);
+		dialog.setLayout(new BoxLayout(dialog.getContentPane(), BoxLayout.PAGE_AXIS));
+		
+		JLabel lblMapSize = new JLabel("Map Size");
+		dbgDialog.add(lblMapSize);
+		JPanel pane = new JPanel();
+		JLabel lblWidth = new JLabel("Width:");
+		JTextField txtWidth = new JTextField(GameManager.Instance.getGrid().length + "", 6);
+		pane.add(lblWidth);
+		pane.add(txtWidth);
+		dbgDialog.add(pane);
+		JLabel lblHeight = new JLabel("Height:");
+		JTextField txtHeight = new JTextField(GameManager.Instance.getGrid()[0].length + "", 6);
+		pane = new JPanel();
+		pane.add(lblHeight);
+		pane.add(txtHeight);
+		dbgDialog.add(pane);
+		
+		Integer[] choices = {2, 3, 4, 5, 6, 7, 8, 9, 10};
+		pane = new JPanel();
+		JComboBox<Integer> cboNPlayers = new JComboBox<Integer>(choices);
+		cboNPlayers.setSelectedIndex(0);
+		JLabel lblNPlayers = new JLabel("Num Players: ");
+		pane.add(lblNPlayers);
+		pane.add(cboNPlayers);
+		dbgDialog.add(pane);
+		
+		JPanel playerPane = new JPanel();
+		dbgDialog.add(playerPane);
+		
+		JLabel lblDebug = new JLabel("Show Debug:");
+		JCheckBox chkDebug = new JCheckBox("Show Debug:");
+		pane = new JPanel();
+		pane.add(lblDebug);
+		pane.add(chkDebug);
+		dbgDialog.add(pane);
+	}
+	
+	private JPanel createPlayerPanel(int nPlayers) {
+		// TO BE DONE
+		return null;
 	}
 	
 	private JDialog dialog;

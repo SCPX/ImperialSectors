@@ -52,6 +52,7 @@ public class CapitalShip extends Ship {
 			_location.EnterSector(s);
 			_order = Orders.STANDBY;
 		} else if(_order == Orders.UPGRADE) {
+			_upgradeTarget._upgrading = false;
 			_upgradeTarget.Upgrade();
 			_upgradeTarget = null;
 			_order = Orders.STANDBY;
