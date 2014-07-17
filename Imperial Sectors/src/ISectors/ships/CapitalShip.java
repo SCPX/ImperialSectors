@@ -19,7 +19,8 @@ public class CapitalShip extends Ship {
 	
 	public CapitalShip(int player) {
 		super(player);
-		this._armor = 50;
+		this._armor = 20;
+		this._maxArmor = 20;
 		this._firepower = 0;
 		this._sensors = (float)1.5;
 		this._shipName = "Capitol Ship";
@@ -38,6 +39,12 @@ public class CapitalShip extends Ship {
 		_availableOrders[1] = Orders.STANDBY;
 		_availableOrders[2] = Orders.BUILD;
 		_availableOrders[3] = Orders.UPGRADE;
+	}
+	
+	@Override
+	public void Destroy() {
+		super.Destroy();
+		JOptionPane.showMessageDialog(_location, "Player " + this._player + " has lost!");
 	}
 	
 	@Override

@@ -11,6 +11,7 @@ public class Cruiser extends Ship {
 	public Cruiser(int player) {
 		super(player);
 		this._armor = 2;
+		this._maxArmor = 2;
 		this._firepower = 2;
 		this._sensors = 1;
 		this._shipName = "Cruiser";
