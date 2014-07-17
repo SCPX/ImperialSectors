@@ -265,10 +265,15 @@ public class Location extends Component{
 			// Determine combat distribution.
 			if(debug) System.out.println("Resolving combat for fleet " + i + " with firepower " + fleetCombat[i]);
 			while(fleetCombat[i] > 0) {
-				int targetFleet;
+				int targetFleet; int nTries = 0;
 				do {
 					targetFleet = (int)(Math.random() * nFleets);
-				} while (nShips[targetFleet] <= 0 || fleets[targetFleet][0].getLoyalty() == fleetAlignments[i]);
+				} while ((nShips[targetFleet] <= 0 || fleets[targetFleet][0].getLoyalty() == fleetAlignments[i]) && nTries++ < 20);
+				if(nTries >= 20) {
+					// assume no more targets
+					if(debug) System.out.println("-No more targets. Moving on...");
+					break;
+				}
 				int targetShip = (int)(Math.random() * nShips[targetFleet]);
 				float shipDef = fleets[targetFleet][targetShip].getArmor();
 				if(debug) System.out.println("-Target fleet " + targetFleet + ", ship " + targetShip + " with defense of " + shipDef);

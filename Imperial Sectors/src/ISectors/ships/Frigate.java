@@ -15,6 +15,7 @@ public class Frigate extends Ship {
 	public Frigate(int player) {
 		super(player);
 		this._armor = 2;
+		this._maxArmor = 2;
 		this._firepower = 1;
 		this._sensors = 2;
 		this._shipName = "Frigate";

@@ -15,6 +15,7 @@ public abstract class Ship {
 		protected int _tier; // Level of power for the ship. Used for upgrading.
 		protected float _firepower; // Ship's general attack. Compared to the enemy's armor for deciding battles.
 		protected float _armor; // Ship's general defense. Compared to the enemy's firepower for deciding battles.
+		protected float _maxArmor; // Ship's maximum defense. What the armor starts at when game starts.
 		protected float _speed; // Number of sectors a ship can traverse per turn.
 		protected float _sensors; // Range in sectors that a ship can clear the fog of war.
 		protected Location _location; // Current sector which the ship resides in.
@@ -227,7 +228,11 @@ public abstract class Ship {
 				Destroy();
 				break;
 			case STANDBY:
-				//Spin, spin
+				//If damaged, perform repairs
+				if(_armor < _maxArmor)
+				{
+					_armor += 1;
+				}
 				break;
 			default:
 				System.err.println("Invalid order for " + _shipName + " at " + _location);

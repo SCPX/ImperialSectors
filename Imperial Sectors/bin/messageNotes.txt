@@ -1,0 +1,34 @@
+Client Message - Result
+REQUEST TABLE - Requests list of available games
+REQUEST GAME <ID> - Requests more information on specified game
+JOIN GAME <ID> [PASSWORD] - Registers player to specific game and, if game is at capacity, start game.
+LEAVE GAME <ID> - Removes player from specific game and checks game's status.
+CREATE GAME <ID> [PASSWORD] <MAXPLAYERS> <WIDTH> <HEIGHT> - Registers a new game with provided data
+LOGIN <USERID> - Registers player ID to server.
+LOGOUT <USERID> - Removes player ID from server.
+UPDATE <OLD_USERID> <NEW_USERID> - Change user ID to a new user ID.
+GETUSERID - Requests a unique ID from the server.
+FINDUSER <USERID> - Requests connection status of a given user ID.
+
+Server Message - Result
+TABLE <#ROWS> <ROW1DATA> <ROW2DATA> ... - Reports list of available games
+GAME <GID> <#PLAYERS> <MAXPLAYERS> <WIDTH> <HEIGHT> - Report details on specific game
+JOIN SUCCESS <GID> <WIDTH> <HEIGHT> - Report sucessful join of game and size of game map.
+JOIN FAILED <GID> <ERROR> - Report failed game join, and error report.
+GAME JOINED <UID> <GID> - Inform players of a new player joining a game.
+GAME LEFT <GID> - Report leaving of game
+CREATE SUCCESS <GID> - Report sucessful game created and confirm ID
+CREATE FAILED <GID> <ERROR> - Report failed game created for given ID and error report.
+START <GID> PLAYERS <PLAYER1UID> <PLAYER2UID> ... -  Inform players to start a new game, and reports which player is whom. This is usually immediately followed by a TURN message.
+TURN <GID> <TURN#> LOG <#ROWS> <ROW1DATA> <ROW2DATA> ... SHIPS <PLAYER#> <#SHIPS> <SHIP1TYPE> <SHIP1XPOS> <SHIP1YPOS> ... SHIPS <PLAYER#> <#SHIPS> <SHIP1TYPE>... TURNEND - Inform players of end of round, log of changes/conflicts, and list of ships and positions for all players. 
+ENDGAME <ID> <WINNER#> LOG <#ROWS> <ROW1DATA> <ROW2DATA> ... - Inform players of end of game. Usually reported after a TURN message.
+LOGIN SUCCESS <UID> - Reports successful user login. If GETUSERID was used, this will return the new user id to the client.
+LOGIN FAILED <UID> <ERROR> - Reports failed user login and reasoning.
+USER <UID> <STATUS> - Reports whether specified user is online or not.
+
+CAPITAL
+SCOUTER
+FIGHTER
+FRIGATE
+CRUISER
+BATTLES

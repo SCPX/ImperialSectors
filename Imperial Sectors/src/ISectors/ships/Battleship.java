@@ -16,6 +16,7 @@ public class Battleship extends Ship {
 	public Battleship(int player) {
 		super(player);
 		this._armor = 4;
+		this._maxArmor = 4;
 		this._firepower = 3;
 		this._sensors = 1;
 		this._shipName = "Battleship";

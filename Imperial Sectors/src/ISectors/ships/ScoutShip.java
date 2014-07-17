@@ -13,6 +13,7 @@ public class ScoutShip extends Ship {
 	public ScoutShip(int player) {
 		super(player);
 		this._armor = 1;
+		this._maxArmor = 1;
 		this._firepower = 0;
 		this._sensors = 4;
 		this._shipName = "Scout";
