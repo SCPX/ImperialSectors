@@ -1,0 +1,4 @@
+Things still to do:
+Save Game
+Online functionality
+AI players
