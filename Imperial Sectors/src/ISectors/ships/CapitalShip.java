@@ -5,7 +5,7 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 import javax.swing.JOptionPane;
 
-import ISectors.Location;
+import ISectors.engine.Location;
 import ISectors.ships.ScoutShip;
 
 /**

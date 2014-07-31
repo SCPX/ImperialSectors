@@ -4,7 +4,7 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import ISectors.Location;
+import ISectors.engine.Location;
 
 /**
  * A wrapper class for storing a list of ships

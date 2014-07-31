@@ -1,4 +1,4 @@
-package ISectors;
+package ISectors.engine;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -8,6 +8,7 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
 import ISectors.ships.*;
+import ISectors.planets.*;
 import ISectors.ships.Ship.Orders;
 
 public class Location extends Component{
@@ -19,7 +20,8 @@ public class Location extends Component{
 	private int _col; // X coordinate position on grid of this Sector.
 //	private Fleet _occupants = null;
 	private ArrayList<Ship> _occupants;
-	private int border = 0;
+	private Planet _planet;
+	private int border = 1;
 	public boolean selected = false;
 //	private boolean conflicted = false;
 
@@ -56,16 +58,23 @@ public class Location extends Component{
 	
 	public void paint(Graphics g) {
 		Rectangle bounds = this.getBounds();
-		if(TurnManager.isLocationVisible(this) && BattleMap.displayMap) {
-			if(!selected && TurnManager.isReachable(this)) {
+		if(TurnManager.isLocationVisible(this) && ISectors.view.BattleMap.displayMap) { // Location is not in fog of war.
+			if(!selected && TurnManager.isReachable(this)) { // This location is within range of the selected ship without being the selected location itself.
 				g.setColor(Color.blue);
-				g.fillRect(bounds.x + 1, bounds.y + 1, bounds.width - (2 * 1), bounds.height - (2 * 1));
-			} else {
-				g.setColor(Color.black);
 				g.fillRect(bounds.x + border, bounds.y + border, bounds.width - (2 * border), bounds.height - (2 * border));
+			} else { // Location is not within range of any selected ship, if there are any selected ships.
+				g.setColor(Color.black);
+				//g.fillRect(bounds.x + border, bounds.y + border, bounds.width - (2 * border), bounds.height - (2 * border));
+				g.fillRect(bounds.x, bounds.y, bounds.width, bounds.height);
 			}
-			//draw fleet
-			if(!_occupants.isEmpty()) {
+			//draw fleet/planet
+			if(_planet != null) {
+				BufferedImage _icon;
+				_icon = _planet.getIcon();
+				if(_icon != null) {
+					g.drawImage(_icon, bounds.x + border, bounds.y + border, bounds.width - (2 * border), bounds.height - (2 * border), null);
+				}
+			} else if(!_occupants.isEmpty()) {
 				BufferedImage _icon;
 				if(_occupants.size() > 1) {
 					_icon = Ship.getSquadImage();
@@ -76,20 +85,22 @@ public class Location extends Component{
 					g.drawImage(_icon, bounds.x + border, bounds.y + border, bounds.width - (2 * border), bounds.height - (2 * border), null);
 				}
 			}
-			if(selected) {
+			
+			if(selected) { // This is the selected location. Draw selection border
 				int selectedBorder = 3;
 				g.setColor(Color.red);
 				for(int i = 0; i < selectedBorder; i++) {
 					g.drawRect(bounds.x + i, bounds.y + i, bounds.width - (2 * i), bounds.height - (2 * i));
 				}
 			}
-		} else {
-			if(!selected && TurnManager.isReachable(this)) {
+		} else { // Location is a part of the fog of war.
+			if(!selected && TurnManager.isReachable(this)) { // Location is within travel range of selected ship.
 				g.setColor(Color.blue);
-				g.fillRect(bounds.x + 1, bounds.y + 1, bounds.width - (2 * 1), bounds.height - (2 * 1));
-			} else {
-				g.setColor(Color.DARK_GRAY);
 				g.fillRect(bounds.x + border, bounds.y + border, bounds.width - (2 * border), bounds.height - (2 * border));
+			} else { 
+				g.setColor(Color.DARK_GRAY);
+				g.fillRect(bounds.x, bounds.y, bounds.width, bounds.height);
+//				g.fillRect(bounds.x + border, bounds.y + border, bounds.width - (2 * border), bounds.height - (2 * border));
 			}
 		}
 	}
@@ -310,6 +321,14 @@ public class Location extends Component{
 				}
 			}//*/
 		}
+	}
+	
+	public void setPlanet(Planet p) {
+		_planet = p;
+	}
+	
+	public Planet getPlanet() {
+		return _planet;
 	}
 	
 	public void Activate() {

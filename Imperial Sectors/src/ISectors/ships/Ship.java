@@ -6,8 +6,8 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 import javax.swing.JOptionPane;
 
-import ISectors.Location;
-import ISectors.TurnManager;
+import ISectors.engine.Location;
+import ISectors.engine.TurnManager;
 
 public abstract class Ship {
 	// TODO: Check if there are enemies between you and the target destination. Even if the target destination has enemies in it, if there isn't a clear path, you can't go there.

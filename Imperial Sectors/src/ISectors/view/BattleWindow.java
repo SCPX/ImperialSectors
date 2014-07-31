@@ -1,12 +1,14 @@
-package ISectors;
+package ISectors.view;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.text.NumberFormat;
 
 import javax.swing.*;
+import javax.swing.text.NumberFormatter;
 
-import ISectors.GameManager.GameType;
+import ISectors.engine.GameManager;
 
 public class BattleWindow extends JFrame implements ActionListener {	
 	private static final long serialVersionUID = 5149958171543488559L;
@@ -97,7 +99,7 @@ public class BattleWindow extends JFrame implements ActionListener {
 		pane.add(cboNPlayers);
 		dbgDialog.add(pane);
 		
-		JPanel playerPane = new JPanel();
+		JPanel playerPane = createPlayerPanel((int)cboNPlayers.getSelectedItem());
 		dbgDialog.add(playerPane);
 		
 		JLabel lblDebug = new JLabel("Show Debug:");
@@ -110,15 +112,17 @@ public class BattleWindow extends JFrame implements ActionListener {
 	
 	private JPanel createPlayerPanel(int nPlayers) {
 		// TO BE DONE
-		return null;
+		return new JPanel();
 	}
 	
 	private JDialog dialog;
 	private JPanel displayPane;
 	private JComboBox<String> modeSelect;
+	private JComboBox<String> gameSelect;
 	private JLabel[] labels;
 	private JComboBox<Integer> playerSelect;
-	private JTextField[] sizes;
+	private JFormattedTextField txtPlanets;
+	private JFormattedTextField[] sizes;
 	private JButton[] buttons;
 	private JTable gameList;
 	
@@ -135,7 +139,7 @@ public class BattleWindow extends JFrame implements ActionListener {
 		buttons[0].addActionListener(this);
 		buttons[1].addActionListener(this);
 		
-		JLabel modeLabel = new JLabel("Mode:");
+		JLabel modeLabel = new JLabel("Game Type:");
 		String[] options = {"LOCAL", "ONLINE"};
 		modeSelect = new JComboBox<String>(options);
 		modeSelect.setSelectedIndex(0);
@@ -159,7 +163,7 @@ public class BattleWindow extends JFrame implements ActionListener {
 		modePanel.add(modeLabel);
 		modePanel.add(modeSelect);
 		dialog.add(modePanel);
-		
+				
 		displayPane = new JPanel();
 		displayPane.setLayout(new BoxLayout(displayPane, BoxLayout.PAGE_AXIS));
 		dialog.add(displayPane);
@@ -171,33 +175,58 @@ public class BattleWindow extends JFrame implements ActionListener {
 	}
 	
 	private void createLocalData(JPanel pane) {
-		labels = new JLabel[4];
+		labels = new JLabel[5];
 		labels[0] = new JLabel("Number of Players:");
-		labels[1] = new JLabel("Size of Map:");
-		labels[2] = new JLabel("Width:");
-		labels[3] = new JLabel("Height:");
+		labels[1] = new JLabel("Number of Planets:");
+		labels[2] = new JLabel("Size of Map:");
+		labels[3] = new JLabel("Width:");
+		labels[4] = new JLabel("Height:");
 		
 		Integer[] choices = {2, 3, 4, 5, 6, 7, 8, 9, 10};
 		playerSelect = new JComboBox<Integer>(choices);
 		playerSelect.setSelectedIndex(0);
 		
-		sizes = new JTextField[2];
-		sizes[0] = new JTextField(GameManager.DEFAULT_ROWS + "", 6);
-		sizes[1] = new JTextField(GameManager.DEFAULT_COLS + "", 6);
+		NumberFormatter formatter = new NumberFormatter(NumberFormat.getInstance());
+		formatter.setValueClass(Integer.class);
+		formatter.setMinimum(0);
+		formatter.setMaximum(Integer.MAX_VALUE);
+		formatter.setCommitsOnValidEdit(true);
+		sizes = new JFormattedTextField[2];
+		sizes[0] = new JFormattedTextField(formatter);//GameManager.DEFAULT_ROWS + "", 6);
+		sizes[0].setText(GameManager.DEFAULT_ROWS + "");
+		sizes[0].setColumns(6);
+		sizes[1] = new JFormattedTextField(formatter);//GameManager.DEFAULT_COLS + "", 6);
+		sizes[1].setText(GameManager.DEFAULT_COLS + "");
+		sizes[1].setColumns(6);
 		
+		txtPlanets = new JFormattedTextField(formatter);//"0", 3);
+		txtPlanets.setText("0");
+		txtPlanets.setColumns(3);
+	
+		JLabel modeLabel = new JLabel("Game Mode:");
+		String [] options = {"Deathmatch", "Survival", "Domination"};
+		gameSelect = new JComboBox<String>(options);
+		JPanel modePanel = new JPanel();
+		modePanel.add(modeLabel);
+		modePanel.add(gameSelect);
+		pane.add(modePanel);
 		
 		JPanel p = new JPanel();
 		p.add(labels[0]);
 		p.add(playerSelect);
 		pane.add(p);
-		labels[1].setAlignmentX(Component.RIGHT_ALIGNMENT);
-		pane.add(labels[1]);
+		p = new JPanel();
+		p.add(labels[1]);
+		p.add(txtPlanets);
+		pane.add(p);
+		labels[2].setAlignmentX(Component.RIGHT_ALIGNMENT);
+		pane.add(labels[2]);
 		JPanel wPanel = new JPanel();
-		wPanel.add(labels[2]);
+		wPanel.add(labels[3]);
 		wPanel.add(sizes[0]);
 		pane.add(wPanel);
 		JPanel hPanel = new JPanel();
-		hPanel.add(labels[3]);
+		hPanel.add(labels[4]);
 		hPanel.add(sizes[1]);
 		pane.add(hPanel);
 		JPanel btnPanel = new JPanel();
@@ -241,7 +270,6 @@ public class BattleWindow extends JFrame implements ActionListener {
 		btnPanel.add(buttons[0]);
 		btnPanel.add(buttons[1]);
 		pane.add(btnPanel);
-
 	}
 	
 	@Override
@@ -251,7 +279,9 @@ public class BattleWindow extends JFrame implements ActionListener {
 				int nRows = Integer.parseInt(sizes[0].getText());
 				int nCols = Integer.parseInt(sizes[1].getText());
 				int nPlayers = (Integer)(playerSelect.getSelectedItem());
-				GameManager.NewGame(nRows, nCols, GameType.LOCAL, nPlayers, null);
+				int nPlanets = Integer.parseInt(txtPlanets.getText());
+				GameManager.NewGame(nRows, nCols, GameManager.GameType.LOCAL, nPlayers, nPlanets);
+				BattleMap.Instance.loadBattleMap(nRows, nCols);
 			} else if(modeSelect.getSelectedItem() == "ONLINE") {
 				System.out.println("Connect to online game?");
 			}

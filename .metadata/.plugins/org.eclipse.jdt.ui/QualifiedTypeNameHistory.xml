@@ -17,10 +17,8 @@
 <fullyQualifiedTypeName name="ISectors.ships.CapitalShip"/>
 <fullyQualifiedTypeName name="java.net.URL"/>
 <fullyQualifiedTypeName name="java.io.File"/>
-<fullyQualifiedTypeName name="java.awt.image.BufferedImage"/>
 <fullyQualifiedTypeName name="javax.imageio.ImageIO"/>
 <fullyQualifiedTypeName name="java.io.IOException"/>
-<fullyQualifiedTypeName name="ISectors.Location"/>
 <fullyQualifiedTypeName name="javax.swing.JButton"/>
 <fullyQualifiedTypeName name="javax.swing.SwingUtilities"/>
 <fullyQualifiedTypeName name="javax.swing.JPopupMenu"/>
@@ -44,4 +42,11 @@
 <fullyQualifiedTypeName name="java.lang.System"/>
 <fullyQualifiedTypeName name="javax.swing.JOptionPane"/>
 <fullyQualifiedTypeName name="ISectors.BattleMap"/>
+<fullyQualifiedTypeName name="ISectors.Location"/>
+<fullyQualifiedTypeName name="java.awt.image.BufferedImage"/>
+<fullyQualifiedTypeName name="ISectors.view.BattleWindow"/>
+<fullyQualifiedTypeName name="ISectors.engine.Location"/>
+<fullyQualifiedTypeName name="java.text.NumberFormat"/>
+<fullyQualifiedTypeName name="javax.swing.text.NumberFormatter"/>
+<fullyQualifiedTypeName name="ISectors.planets.Planet"/>
 </qualifiedTypeNameHistroy>

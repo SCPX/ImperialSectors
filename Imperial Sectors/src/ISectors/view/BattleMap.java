@@ -1,4 +1,4 @@
-package ISectors;
+package ISectors.view;
 
 import java.awt.Color;
 import java.awt.Graphics;
@@ -16,7 +16,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 
-import ISectors.GameManager.GameType;
+import ISectors.engine.GameManager.GameType;
+import ISectors.engine.*;
 import ISectors.ships.*;
 import ISectors.ships.Ship.Orders;
 
@@ -30,9 +31,7 @@ public class BattleMap extends JPanel implements MouseListener, ActionListener {
 	private int _numCols = 25;
 	private PopupMenuHandler popupHandler;
 	
-	static boolean displayMap = true;
-	static Location selectedLoc = null;
-	static Ship selectedShip = null;
+	public static boolean displayMap = true;
 //	static Orders selectedOrder = Orders.STANDBY;
 	
 	public BattleMap() {
@@ -96,26 +95,26 @@ public class BattleMap extends JPanel implements MouseListener, ActionListener {
 			Location l = (Location) e.getComponent();
 			if(e.getButton() == MouseEvent.BUTTON1) {
 				if(e.isShiftDown()) {
-					if(selectedLoc != null) {
-						selectedLoc.assignOrder(Orders.MOVE, l);
-						selectedLoc.selected = false;
-						selectedLoc = null;
-					} else if(selectedShip != null) {
-						selectedShip.assignOrder(Orders.MOVE, l);
-						selectedShip.getLoc().selected = false;
-						selectedShip = null;
+					if(GameManager.selectedLoc != null) {
+						GameManager.selectedLoc.assignOrder(Orders.MOVE, l);
+						GameManager.selectedLoc.selected = false;
+						GameManager.selectedLoc = null;
+					} else if(GameManager.selectedShip != null) {
+						GameManager.selectedShip.assignOrder(Orders.MOVE, l);
+						GameManager.selectedShip.getLoc().selected = false;
+						GameManager.selectedShip = null;
 					}
 				} else {
-					if(selectedLoc != null) {
-						selectedLoc.selected = false;
-						selectedLoc = null;
+					if(GameManager.selectedLoc != null) {
+						GameManager.selectedLoc.selected = false;
+						GameManager.selectedLoc = null;
 					}
-					if(selectedShip != null) {
-						selectedShip.getLoc().selected = false;
-						selectedShip = null;
+					if(GameManager.selectedShip != null) {
+						GameManager.selectedShip.getLoc().selected = false;
+						GameManager.selectedShip = null;
 					}
 					if(!l.isEmptyOrInvisible() && l.Allegiance() == TurnManager.currentPlayer) {
-						selectedLoc = l;
+						GameManager.selectedLoc = l;
 						l.selected = true;
 					}
 				}
@@ -123,14 +122,14 @@ public class BattleMap extends JPanel implements MouseListener, ActionListener {
 			else if(e.getButton() == MouseEvent.BUTTON3) {
 				// Send order to ships at selectedLoc to move to l
 				if(e.isShiftDown()) {
-					if(selectedLoc != null) {
-						selectedLoc.assignOrder(Orders.MOVE, l);
-						selectedLoc.selected = false;
-						selectedLoc = null;
-					} else if(selectedShip != null) {
-						selectedShip.assignOrder(Orders.MOVE, l);
-						selectedShip.getLoc().selected = false;
-						selectedShip = null;
+					if(GameManager.selectedLoc != null) {
+						GameManager.selectedLoc.assignOrder(Orders.MOVE, l);
+						GameManager.selectedLoc.selected = false;
+						GameManager.selectedLoc = null;
+					} else if(GameManager.selectedShip != null) {
+						GameManager.selectedShip.assignOrder(Orders.MOVE, l);
+						GameManager.selectedShip.getLoc().selected = false;
+						GameManager.selectedShip = null;
 					}
 				} else {
 					popupHandler.generatePopUp(l).show(e.getComponent(), e.getX(), e.getY());
@@ -192,8 +191,8 @@ class PopupMenuHandler implements ActionListener {
 		Ship[] s = l.getOccupants();
 
 		/*** AVAILABLE ORDERS FOR SELECTED SHIPS ***/
-		if(BattleMap.selectedLoc != null && !BattleMap.selectedLoc.isEmptyOrInvisible()) {
-			Ship[] ships = BattleMap.selectedLoc.getOccupants();
+		if(GameManager.selectedLoc != null && !GameManager.selectedLoc.isEmptyOrInvisible()) {
+			Ship[] ships = GameManager.selectedLoc.getOccupants();
 			boolean upgradeMenuCreated = false;
 			Orders[] orders;
 			for(int i = 0; i < ships.length; i++) {
@@ -227,8 +226,8 @@ class PopupMenuHandler implements ActionListener {
 			}
 			popup.addSeparator();
 		} /*** AVAILABLE ORDERS FOR SELECTED LOCATION ***/
-		else if(BattleMap.selectedShip != null) {
-			Orders[] orders = BattleMap.selectedShip.getOrders();
+		else if(GameManager.selectedShip != null) {
+			Orders[] orders = GameManager.selectedShip.getOrders();
 			for(int i = 0; i < orders.length; i++) {
 				if(orders[i] == Orders.UPGRADE) {
 					JMenu upgradeMenu = new JMenu(Ship.OrderToString(orders[i]));
@@ -280,61 +279,61 @@ class PopupMenuHandler implements ActionListener {
 	public void actionPerformed(ActionEvent e) {
 		if(orderItems.containsKey(e.getSource())) {
 			Orders order = orderItems.get(e.getSource());
-			if(BattleMap.selectedLoc != null) {
-				BattleMap.selectedLoc.assignOrder(order, associatedLoc);
-				BattleMap.selectedLoc.selected = false;
-				BattleMap.selectedLoc = null;
-			} else if(BattleMap.selectedShip != null) {
-				BattleMap.selectedShip.assignOrder(order, associatedLoc);
-				BattleMap.selectedShip.getLoc().selected = false;
-				BattleMap.selectedShip = null;
+			if(GameManager.selectedLoc != null) {
+				GameManager.selectedLoc.assignOrder(order, associatedLoc);
+				GameManager.selectedLoc.selected = false;
+				GameManager.selectedLoc = null;
+			} else if(GameManager.selectedShip != null) {
+				GameManager.selectedShip.assignOrder(order, associatedLoc);
+				GameManager.selectedShip.getLoc().selected = false;
+				GameManager.selectedShip = null;
 			}
 		} else if(upgradeItems.containsKey(e.getSource())) {
-			if(BattleMap.selectedLoc != null) {
+			if(GameManager.selectedLoc != null) {
 				// retrieve CapitalShip from location
-				Ship[] ships = BattleMap.selectedLoc.getOccupants();
+				Ship[] ships = GameManager.selectedLoc.getOccupants();
 				for(int i = 0; i < ships.length; i++) {
 					if(ships[i].getClass() == CapitalShip.class) {
 						CapitalShip s = (CapitalShip) ships[i];
 						s.assignOrder(Orders.UPGRADE, upgradeItems.get(e.getSource()));
 						s.getLoc().selected = false;
-						BattleMap.selectedLoc = null;
+						GameManager.selectedLoc = null;
 						break;
 					}
 				}
-			} else if(BattleMap.selectedShip != null) {
-				if(BattleMap.selectedShip.getClass() == CapitalShip.class) {
-					CapitalShip s = (CapitalShip) BattleMap.selectedShip;
+			} else if(GameManager.selectedShip != null) {
+				if(GameManager.selectedShip.getClass() == CapitalShip.class) {
+					CapitalShip s = (CapitalShip) GameManager.selectedShip;
 					s.assignOrder(Orders.UPGRADE, upgradeItems.get(e.getSource()));
 					s.getLoc().selected = false;
-					BattleMap.selectedShip = null;
+					GameManager.selectedShip = null;
 				}
 			}
 		} else if(shipItems.containsKey(e.getSource())) {
-			if(BattleMap.selectedLoc != null) {
-				BattleMap.selectedLoc.selected = false;
-				BattleMap.selectedLoc = null;
+			if(GameManager.selectedLoc != null) {
+				GameManager.selectedLoc.selected = false;
+				GameManager.selectedLoc = null;
 			}
-			if(BattleMap.selectedShip != null) {
-				BattleMap.selectedShip.getLoc().selected = false;
+			if(GameManager.selectedShip != null) {
+				GameManager.selectedShip.getLoc().selected = false;
 			}
 			Ship s = shipItems.get(e.getSource());
 			if(s.getLoyalty() == TurnManager.currentPlayer) {
-				BattleMap.selectedShip = s;
-				BattleMap.selectedShip.getLoc().selected = true;
+				GameManager.selectedShip = s;
+				GameManager.selectedShip.getLoc().selected = true;
 			}
 		} else if(locItem == e.getSource()) {
-			if(BattleMap.selectedLoc != null) {
-				BattleMap.selectedLoc.selected = false;
-				BattleMap.selectedLoc = null;
+			if(GameManager.selectedLoc != null) {
+				GameManager.selectedLoc.selected = false;
+				GameManager.selectedLoc = null;
 			}
-			if(BattleMap.selectedShip != null) {
-				BattleMap.selectedShip.getLoc().selected = false;
-				BattleMap.selectedShip = null;
+			if(GameManager.selectedShip != null) {
+				GameManager.selectedShip.getLoc().selected = false;
+				GameManager.selectedShip = null;
 			}
 			if(!associatedLoc.isEmptyOrInvisible() && associatedLoc.Allegiance() == TurnManager.currentPlayer) {
-				BattleMap.selectedLoc = associatedLoc;
-				BattleMap.selectedLoc.selected = true;
+				GameManager.selectedLoc = associatedLoc;
+				GameManager.selectedLoc.selected = true;
 			}
 		}
 		parent.repaint();

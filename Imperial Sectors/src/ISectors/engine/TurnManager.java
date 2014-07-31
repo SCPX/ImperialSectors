@@ -1,4 +1,4 @@
-package ISectors;
+package ISectors.engine;
 
 import java.util.ArrayList;
 
@@ -82,8 +82,8 @@ public class TurnManager {
 	public static void nextTurn() {
 		currentPlayer++;
 		resetTempValues();
-		BattleMap.selectedLoc = null;
-		BattleMap.selectedShip = null;
+		GameManager.selectedLoc = null;
+		GameManager.selectedShip = null;
 		if(currentPlayer > numPlayers) {
 			endRound();
 			currentPlayer = 1;
@@ -124,23 +124,23 @@ public class TurnManager {
 	}
 	
 	public static boolean isReachable(Location l) {
-		if(BattleMap.selectedShip != null) {
+		if(GameManager.selectedShip != null) {
 			tempSelectedLoc = null;
-			if(Location.distance(BattleMap.selectedShip.getLoc(), l) <= BattleMap.selectedShip.getSpeed()) {
+			if(Location.distance(GameManager.selectedShip.getLoc(), l) <= GameManager.selectedShip.getSpeed()) {
 				return true;
 			}
-		} else if(BattleMap.selectedLoc != null) {
-			if(BattleMap.selectedLoc != tempSelectedLoc) {
+		} else if(GameManager.selectedLoc != null) {
+			if(GameManager.selectedLoc != tempSelectedLoc) {
 				maxSpeed = 0;
-				Ship[] ships = BattleMap.selectedLoc.getOccupants();
+				Ship[] ships = GameManager.selectedLoc.getOccupants();
 				for(int i = 0; i < ships.length; i++) {
 					if(ships[i].getSpeed() > maxSpeed) {
 						maxSpeed = ships[i].getSpeed();
 					}
 				}
-				tempSelectedLoc = BattleMap.selectedLoc;
+				tempSelectedLoc = GameManager.selectedLoc;
 			}
-			if(Location.distance(BattleMap.selectedLoc, l) <= maxSpeed) {
+			if(Location.distance(GameManager.selectedLoc, l) <= maxSpeed) {
 				return true;
 			}
 		}
