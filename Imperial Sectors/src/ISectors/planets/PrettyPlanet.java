@@ -1,8 +1,9 @@
 /**
  * This is a test class.
  */
-package ISectors.engine;
+package ISectors.planets;
 
+import ISectors.engine.Location;
 import ISectors.planets.Planet;
 
 /**

@@ -13,6 +13,8 @@ public class TurnManager {
 	private static ArrayList<Location> activeLocations;
 	private static Location tempSelectedLoc = null;
 	private static float maxSpeed = 0;
+	
+	public static boolean NoFoW = false;
 
 	public static int numPlayers;
 	public static int currentPlayer = 1;
@@ -109,6 +111,8 @@ public class TurnManager {
 	}
 	
 	public static boolean isLocationVisible(Location l) {
+		if(NoFoW) return true;
+		
 		ArrayList<Ship> fleet = playerFleets.get(currentPlayer - 1);
 		for(int i = 0; i < fleet.size(); i++) {
 			Ship s = fleet.get(i);

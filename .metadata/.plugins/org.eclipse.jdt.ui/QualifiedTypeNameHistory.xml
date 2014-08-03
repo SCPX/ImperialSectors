@@ -45,8 +45,9 @@
 <fullyQualifiedTypeName name="ISectors.Location"/>
 <fullyQualifiedTypeName name="java.awt.image.BufferedImage"/>
 <fullyQualifiedTypeName name="ISectors.view.BattleWindow"/>
-<fullyQualifiedTypeName name="ISectors.engine.Location"/>
 <fullyQualifiedTypeName name="java.text.NumberFormat"/>
 <fullyQualifiedTypeName name="javax.swing.text.NumberFormatter"/>
 <fullyQualifiedTypeName name="ISectors.planets.Planet"/>
+<fullyQualifiedTypeName name="ISectors.engine.TurnManager"/>
+<fullyQualifiedTypeName name="ISectors.engine.Location"/>
 </qualifiedTypeNameHistroy>

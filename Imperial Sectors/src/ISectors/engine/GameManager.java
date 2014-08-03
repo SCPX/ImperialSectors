@@ -14,6 +14,8 @@ public class GameManager {
 	public static final int port_num = 1717;
 	public static GameManager Instance;
 	public enum GameType { NETWORK, LOCAL };
+	
+	public static boolean debug = false;
 
 	public static final int DEFAULT_ROWS = 25;
 	public static final int DEFAULT_COLS = 25;
@@ -28,7 +30,7 @@ public class GameManager {
 	private Location[][] _grid;
 	private int numRows;
 	private int numCols;
-
+	private int numPlanets;
 	
 	public static void Initialize() {
 		if(Instance == null) {
@@ -68,6 +70,7 @@ public class GameManager {
 	private void setUpMap(int nRows, int nCols, int nPlanets) {
 		this.numCols = nCols;
 		this.numRows = nRows;
+		this.numPlanets = nPlanets;
 		
 		_grid = new Location[numRows][numCols];
 		
@@ -82,36 +85,45 @@ public class GameManager {
 		Random r = new Random();
 		int xPos = 0, yPos = 0;
 		int maxAttempts = 5, attempts = 0; 
+		Location[] planetLocs = null;
 		// Place Planets
 		if(nPlanets > 0){
-			Location[] planetLocs = new Location[nPlanets];
-			minDistance = Math.max(nRows, nCols) / nPlanets;
-			double tmp1,tmp2;
-			tmp1 = r.nextGaussian();
-			xPos = (int)(tmp1 * nRows);
-			tmp2 = r.nextGaussian();
-			yPos = (int)(tmp2 * nCols);
-			System.out.println("Placing planet at " + xPos + "(" + tmp1 + "), " + yPos + "(" + tmp2 + ")");
+			planetLocs = new Location[nPlanets];
+			minDistance = Math.max(nRows, nCols) / (float)nPlanets;
+			
+			if(debug) System.out.println("minDistance for planets is " + minDistance);
+			
+			do {
+				xPos = (int)((r.nextGaussian() * nRows / 6) + (nRows / 2));
+				yPos = (int)((r.nextGaussian() * nCols / 6) + (nCols / 2));
+			} while(xPos < 0 || xPos >= nRows || yPos  < 0 || yPos >= nCols);
+
+			if(debug) System.out.println("Placing planet at " + xPos + ", " + yPos);
+
 			_grid[xPos][yPos].setPlanet(new PrettyPlanet(_grid[xPos][yPos]));
 			planetLocs[0] = _grid[xPos][yPos];
 			for(int i = 1; i < nPlanets; i++) {
-				validLoc = true;
 				attempts = 0;
 				do {
-					tmp1 = r.nextGaussian();
-					xPos = (int)(tmp1 * nRows);
-					tmp2 = r.nextGaussian();
-					yPos = (int)(tmp2 * nCols);
-					System.out.println("Placing planet at " + xPos + "(" + tmp1 + "), " + yPos + "(" + tmp2 + ")");
+					validLoc = true;
 					
+					do {
+						xPos = (int)((r.nextGaussian() * nRows / 6) + (nRows / 2));
+						yPos = (int)((r.nextGaussian() * nCols / 6) + (nCols / 2));
+					} while(xPos < 0 || xPos >= nRows || yPos  < 0 || yPos >= nCols);
+			
 					for(int loc = 0; loc < i - 1; loc++) {
-						if(Location.distance(planetLocs[i], _grid[xPos][yPos]) < minDistance) {
+						if(Location.distance(planetLocs[loc], _grid[xPos][yPos]) < minDistance) {
 							validLoc = false;
 							break;
 						}
 					}
 					attempts++;
 				} while(!validLoc && attempts < maxAttempts);
+
+				if(debug && attempts >= maxAttempts) System.out.println("Max attempts reached. Placing planet at " + xPos + ", " + yPos);
+				else if(debug) System.out.println("Placing planet at " + xPos + ", " + yPos);
+				
 				_grid[xPos][yPos].setPlanet(new PrettyPlanet(_grid[xPos][yPos]));
 				planetLocs[i] = _grid[xPos][yPos];
 			}
@@ -119,19 +131,27 @@ public class GameManager {
 		
 		// Place Players
 		minDistance = Math.max(numRows, numCols) / TurnManager.numPlayers;
+		
+		if(debug) System.out.println("MinDistance for ships is " + minDistance);
+		
 		Location[] startPoints = new Location[TurnManager.numPlayers];
 		xPos = r.nextInt(numRows);
 		yPos = r.nextInt(numCols);
+
+		if(debug) System.out.println("Placing player 1's ship at " + xPos + ", " + yPos);
+
 		// Randomly place the first player.
 		_grid[xPos][yPos].EnterSector(new CapitalShip(1));
 		startPoints[0] = _grid[xPos][yPos];
 		for(int i = 2; i <= TurnManager.numPlayers; i++) {
-			validLoc = true;
 			attempts = 0;
 			do {
+				validLoc = true;
+				
 				// Randomly determine a direction and a distance from first player.
 				xPos = r.nextInt(numRows);
 				yPos = r.nextInt(numCols);
+
 				// Analyze location as a valid location. i.e. not within minDistance of other players and still a valid location.
 				for(int loc = 0; loc < i - 1; loc++) {
 					if(Location.distance(startPoints[loc], _grid[xPos][yPos]) < minDistance) {
@@ -139,8 +159,22 @@ public class GameManager {
 						break;
 					}
 				}
+				
+				if(nPlanets > 0 && validLoc) {
+					for(int p = 0; p < nPlanets; p++) {
+						if(Location.distance(planetLocs[p], _grid[xPos][yPos]) < minDistance) {
+							validLoc = false;
+							break;
+						}
+					}
+				}
+				
 				attempts++;
 			} while(!validLoc && attempts < maxAttempts);
+
+			if(debug && attempts >= maxAttempts) System.out.println("Max Attempts reached. Placing player " + i + "'s ship at " + xPos + ", " + yPos);
+			if(debug) System.out.println("Placing player " + i + "'s ship at " + xPos + ", " + yPos);
+			
 			// If valid, assign location as starting point and move on.
 			_grid[xPos][yPos].EnterSector(new CapitalShip(i));
 			startPoints[i - 1] = _grid[xPos][yPos];
@@ -165,5 +199,17 @@ public class GameManager {
 	
 	public GameType getGameType() {
 		return gameType;
+	}
+	
+	public int getRows() {
+		return numRows;
+	}
+	
+	public int getCols() {
+		return numCols;
+	}
+	
+	public int getNPlanets() {
+		return numPlanets;
 	}
 }

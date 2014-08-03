@@ -9,6 +9,7 @@ import javax.swing.*;
 import javax.swing.text.NumberFormatter;
 
 import ISectors.engine.GameManager;
+import ISectors.engine.TurnManager;
 
 public class BattleWindow extends JFrame implements ActionListener {	
 	private static final long serialVersionUID = 5149958171543488559L;
@@ -36,16 +37,26 @@ public class BattleWindow extends JFrame implements ActionListener {
 		JMenuBar bar = new JMenuBar();
 		setJMenuBar(bar);
 		JMenu fileMenu = new JMenu("File");
+		fileMenu.setMnemonic('F');
 		JMenu OptionMenu = new JMenu("Options");
+		OptionMenu.setMnemonic('O');
 		bar.add(fileMenu);
 		bar.add(OptionMenu);
 		
 		JMenuItem itmNewGame = new JMenuItem("New Game");
+		itmNewGame.setMnemonic('N');
 		JMenuItem itmExit = new JMenuItem("Exit");
-		JMenuItem itmDebug = new JMenuItem("Debug");
+		itmExit.setMnemonic('X');
+		JMenuItem itmRegenerate = new JMenuItem("Generate New Map");
+		JCheckBoxMenuItem itmDebug = new JCheckBoxMenuItem("Debug");
+		itmDebug.setState(false);
+		JCheckBoxMenuItem itmFoW = new JCheckBoxMenuItem("Fog Of War");
+		itmFoW.setState(true);
 		fileMenu.add(itmNewGame);
 		fileMenu.add(itmExit);
+		OptionMenu.add(itmRegenerate);
 		OptionMenu.add(itmDebug);
+		OptionMenu.add(itmFoW);
 		
 		itmNewGame.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -59,9 +70,24 @@ public class BattleWindow extends JFrame implements ActionListener {
 			}
 		});
 		
+		itmRegenerate.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				GameManager.NewGame(GameManager.Instance.getRows(), GameManager.Instance.getCols(), GameManager.Instance.getGameType(), TurnManager.numPlayers, GameManager.Instance.getNPlanets());
+				BattleMap.Instance.loadBattleMap(GameManager.Instance.getRows(), GameManager.Instance.getCols());
+			}
+		});
+		
 		itmDebug.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				//Setup debug dialog.
+				GameManager.debug = !GameManager.debug;
+			}
+		});
+		
+		itmFoW.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				//Disable/enable FoW
+				TurnManager.NoFoW = !TurnManager.NoFoW;
 			}
 		});
 		
