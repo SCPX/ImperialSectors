@@ -84,8 +84,7 @@ public class TurnManager {
 	public static void nextTurn() {
 		currentPlayer++;
 		resetTempValues();
-		GameManager.selectedLoc = null;
-		GameManager.selectedShip = null;
+		GameManager.selectedObj = null;
 		if(currentPlayer > numPlayers) {
 			endRound();
 			currentPlayer = 1;
@@ -128,23 +127,26 @@ public class TurnManager {
 	}
 	
 	public static boolean isReachable(Location l) {
-		if(GameManager.selectedShip != null) {
+		if(GameManager.selectedObj instanceof Ship) {
 			tempSelectedLoc = null;
-			if(Location.distance(GameManager.selectedShip.getLoc(), l) <= GameManager.selectedShip.getSpeed()) {
+			if(Location.distance(((Ship)(GameManager.selectedObj)).getLoc(), l) <= ((Ship)(GameManager.selectedObj)).getSpeed()) {
 				return true;
 			}
-		} else if(GameManager.selectedLoc != null) {
-			if(GameManager.selectedLoc != tempSelectedLoc) {
-				maxSpeed = 0;
-				Ship[] ships = GameManager.selectedLoc.getOccupants();
+		} else if(GameManager.selectedObj instanceof Location) {
+			if(GameManager.selectedObj != tempSelectedLoc) {
+				Ship[] ships = ((Location)(GameManager.selectedObj)).getOccupants();
+				maxSpeed = Float.MAX_VALUE;
 				for(int i = 0; i < ships.length; i++) {
-					if(ships[i].getSpeed() > maxSpeed) {
+					if(ships[i].getLoyalty() == currentPlayer && ships[i].getSpeed() < maxSpeed) {
 						maxSpeed = ships[i].getSpeed();
 					}
 				}
-				tempSelectedLoc = GameManager.selectedLoc;
+				if(maxSpeed >= Float.MAX_VALUE) {
+					maxSpeed = 0.0f;
+				}
+				tempSelectedLoc = (Location)(GameManager.selectedObj);
 			}
-			if(Location.distance(GameManager.selectedLoc, l) <= maxSpeed) {
+			if(Location.distance((Location)(GameManager.selectedObj), l) <= maxSpeed) {
 				return true;
 			}
 		}

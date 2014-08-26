@@ -8,7 +8,6 @@ import javax.swing.JOptionPane;
 
 import ISectors.planets.*;
 import ISectors.ships.CapitalShip;
-import ISectors.ships.Ship;
 
 public class GameManager {
 	public static final int port_num = 1717;
@@ -20,8 +19,7 @@ public class GameManager {
 	public static final int DEFAULT_ROWS = 25;
 	public static final int DEFAULT_COLS = 25;
 
-	public static Location selectedLoc = null;
-	public static Ship selectedShip = null;
+	public static Selectable selectedObj = null;
 	
 	private GameType gameType;
 	private Socket sock;
@@ -54,8 +52,7 @@ public class GameManager {
 		}
 
 		Instance.setUpMap(nRows, nCols, nPlanets);
-		selectedLoc = null;
-		selectedShip = null;
+		selectedObj = null;
 		//ISectors.view.BattleMap.Instance.loadBattleMap(nRows, nCols);//Implemented in BattleWindow.
 	}
 	

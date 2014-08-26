@@ -11,7 +11,7 @@ import ISectors.ships.*;
 import ISectors.planets.*;
 import ISectors.ships.Ship.Orders;
 
-public class Location extends Component{
+public class Location extends Component implements Selectable {
 	private boolean debug = false;
 	
 	private static final long serialVersionUID = -7388200672741015050L;
@@ -22,7 +22,7 @@ public class Location extends Component{
 	private ArrayList<Ship> _occupants;
 	private Planet _planet;
 	private int border = 1;
-	public boolean selected = false;
+	//public boolean selected = false;
 //	private boolean conflicted = false;
 
 	public Location(int x, int y) {
@@ -59,7 +59,7 @@ public class Location extends Component{
 	public void paint(Graphics g) {
 		Rectangle bounds = this.getBounds();
 		if(TurnManager.isLocationVisible(this) && ISectors.view.BattleMap.displayMap) { // Location is not in fog of war.
-			if(!selected && TurnManager.isReachable(this)) { // This location is within range of the selected ship without being the selected location itself.
+			if(GameManager.selectedObj.getSelectedLoc() != this && TurnManager.isReachable(this)) { // This location is within range of the selected ship without being the selected location itself.
 				g.setColor(Color.blue);
 				g.fillRect(bounds.x + border, bounds.y + border, bounds.width - (2 * border), bounds.height - (2 * border));
 			} else { // Location is not within range of any selected ship, if there are any selected ships.
@@ -86,7 +86,7 @@ public class Location extends Component{
 				}
 			}
 			
-			if(selected) { // This is the selected location. Draw selection border
+			if(GameManager.selectedObj.getSelectedLoc() == this) { // This is the selected location. Draw selection border
 				int selectedBorder = 3;
 				g.setColor(Color.red);
 				for(int i = 0; i < selectedBorder; i++) {
@@ -94,7 +94,7 @@ public class Location extends Component{
 				}
 			}
 		} else { // Location is a part of the fog of war.
-			if(!selected && TurnManager.isReachable(this)) { // Location is within travel range of selected ship.
+			if(GameManager.selectedObj.getSelectedLoc() != this && TurnManager.isReachable(this)) { // Location is within travel range of selected ship.
 				g.setColor(Color.blue);
 				g.fillRect(bounds.x + border, bounds.y + border, bounds.width - (2 * border), bounds.height - (2 * border));
 			} else { 
@@ -344,5 +344,10 @@ public class Location extends Component{
 	
 	public static int distance(Location firstLoc, Location secondLoc) {
 		return (int) Math.floor(Math.sqrt(Math.pow(firstLoc._col - secondLoc._col, 2) + Math.pow(firstLoc._row - secondLoc._row, 2)));
+	}
+
+	@Override
+	public Location getSelectedLoc() {
+		return this;
 	}
 }

@@ -6,8 +6,9 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 
 import ISectors.engine.Location;
+import ISectors.engine.Selectable;
 
-public abstract class Planet {
+public abstract class Planet implements Selectable {
 	protected Location _location;
 	protected String _name;
 	protected String _description;
@@ -57,5 +58,9 @@ public abstract class Planet {
 		}
 		// TODO: Rotate ship image
 		return _icon;
+	}
+	
+	public Location getSelectedLoc() {
+		return this._location;
 	}
 }

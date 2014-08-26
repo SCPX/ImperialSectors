@@ -8,8 +8,9 @@ import javax.swing.JOptionPane;
 
 import ISectors.engine.Location;
 import ISectors.engine.TurnManager;
+import ISectors.engine.Selectable;
 
-public abstract class Ship {
+public abstract class Ship implements Selectable {
 	// TODO: Check if there are enemies between you and the target destination. Even if the target destination has enemies in it, if there isn't a clear path, you can't go there.
 		public enum Orders { MOVE, STANDBY, DECOMMISSION, BUILD, UPGRADE }
 		protected int _tier; // Level of power for the ship. Used for upgrading.
@@ -253,6 +254,11 @@ public abstract class Ship {
 				}
 			}
 			return false;
+		}
+		
+		@Override
+		public Location getSelectedLoc() {
+			return this._location;
 		}
 		
 		/**

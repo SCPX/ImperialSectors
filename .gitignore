@@ -4,12 +4,13 @@
 
 *.pydevproject
 .project
-.metadata
+.metadata/
 bin/
 tmp/
 *.tmp
 *.bak
 *.swp
+*.class
 *~.nib
 local.properties
 .classpath

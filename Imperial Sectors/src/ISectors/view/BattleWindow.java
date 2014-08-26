@@ -95,6 +95,7 @@ public class BattleWindow extends JFrame implements ActionListener {
 	}
 	
 	
+	@SuppressWarnings("unused")
 	private void generateDebugDialog() {
 		JDialog dbgDialog = new JDialog(this, "Debug");
 		dbgDialog.setSize(200, 80);
