@@ -33,4 +33,8 @@ public class Cruiser extends Ship {
 		this.Destroy();
 	}
 
+	@Override
+	public boolean canUpgrade() {
+		return true;
+	}
 }

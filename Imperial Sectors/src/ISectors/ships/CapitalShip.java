@@ -7,6 +7,7 @@ import javax.swing.JOptionPane;
 
 import ISectors.engine.Location;
 import ISectors.ships.ScoutShip;
+import ISectors.engine.Orders;
 
 /**
  * 
@@ -71,33 +72,45 @@ public class CapitalShip extends Ship {
 	public void assignOrder(Orders order, Ship target) {
 		if(order == Orders.UPGRADE) {
 			if(Location.distance(_location, target.getLoc()) < repairRange) {
-				_upgradeTarget = target;
-				_order = order;
-				target._upgrading = true;
+				if(target.setUpgrading(true)) {
+					clearOrder();
+					_upgradeTarget = target;
+					_order = order;
+				}
 			} else {
 				JOptionPane.showMessageDialog(_location, "The ship is too far away to be upgraded!\nOnly adjacent ships can be upgraded.");
 			}
 		} else {
-			super.assignOrder(order);
+			assignOrder(order);
 		}
 	}
 	
 	@Override
 	public void assignOrder(Orders order, Location dest) {
-		if(_upgradeTarget != null) {
-			_upgradeTarget._upgrading = false;
-			_upgradeTarget = null;
+		if(isValidOrder(order)) {
+			clearOrder();
 		}
 		super.assignOrder(order, dest);
 	}
 	
-	@Override
-	public void assignOrder(Orders order) {
-		if(_upgradeTarget != null) {
-			_upgradeTarget._upgrading = false;
+	private void clearOrder() {
+		if(_order == Orders.UPGRADE) {
+			_upgradeTarget.setUpgrading(false);
 			_upgradeTarget = null;
 		}
+	}
+	
+	@Override
+	public void assignOrder(Orders order) {
+		if(isValidOrder(order)) {
+			clearOrder();
+		}
 		super.assignOrder(order);
+	}
+
+	@Override
+	public boolean canUpgrade() {
+		return false;
 	}
 
 }

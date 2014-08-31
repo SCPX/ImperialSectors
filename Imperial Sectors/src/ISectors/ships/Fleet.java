@@ -72,7 +72,7 @@ public class Fleet {
 	public void Dismantle() {
 		for(int i = 0; i < _ships.size(); i++) {
 			Ship s = _ships.get(i);
-			s.leaveFleet();
+			//s.leaveFleet();
 		}
 	}
 	
@@ -80,7 +80,7 @@ public class Fleet {
 		Ship[] list = getShips();
 		Dismantle();
 		for(int i = 0; i < list.length; i++) {
-			list[i].joinFleet(f);
+			//list[i].joinFleet(f);
 		}
 	}
 	

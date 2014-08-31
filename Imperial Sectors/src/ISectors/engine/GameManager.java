@@ -97,7 +97,7 @@ public class GameManager {
 
 			if(debug) System.out.println("Placing planet at " + xPos + ", " + yPos);
 
-			_grid[xPos][yPos].setPlanet(new PrettyPlanet(_grid[xPos][yPos]));
+			_grid[xPos][yPos].setPlanet(new IndustrialPlanet(_grid[xPos][yPos]));
 			planetLocs[0] = _grid[xPos][yPos];
 			for(int i = 1; i < nPlanets; i++) {
 				attempts = 0;
@@ -121,7 +121,7 @@ public class GameManager {
 				if(debug && attempts >= maxAttempts) System.out.println("Max attempts reached. Placing planet at " + xPos + ", " + yPos);
 				else if(debug) System.out.println("Placing planet at " + xPos + ", " + yPos);
 				
-				_grid[xPos][yPos].setPlanet(new PrettyPlanet(_grid[xPos][yPos]));
+				_grid[xPos][yPos].setPlanet(new IndustrialPlanet(_grid[xPos][yPos]));
 				planetLocs[i] = _grid[xPos][yPos];
 			}
 		}

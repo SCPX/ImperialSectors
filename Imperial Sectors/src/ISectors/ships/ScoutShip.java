@@ -35,4 +35,9 @@ public class ScoutShip extends Ship {
 		this.Destroy();
 	}
 
+	@Override
+	public boolean canUpgrade() {
+		return true;
+	}
+
 }

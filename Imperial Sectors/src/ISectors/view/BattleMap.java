@@ -20,7 +20,7 @@ import ISectors.engine.GameManager.GameType;
 import ISectors.engine.*;
 import ISectors.planets.Planet;
 import ISectors.ships.*;
-import ISectors.ships.Ship.Orders;
+import ISectors.engine.Orders;
 
 public class BattleMap extends JPanel implements MouseListener, ActionListener {
 	public static BattleMap Instance;
@@ -196,7 +196,7 @@ class PopupMenuHandler implements ActionListener {
 					if(!orderItems.containsValue(orders[j]) && (orders[j] != Orders.UPGRADE || !upgradeMenuCreated)) {
 						if(orders[j] == Orders.UPGRADE) {
 							// Add a submenu with a list of ships to upgrade
-							JMenu upgradeMenu = new JMenu(Ship.OrderToString(orders[j]));
+							JMenu upgradeMenu = new JMenu(Orders.OrderToString(orders[j]));
 							if(!l.isEmptyOrInvisible())
 							{
 								for(int si = 0; si < s.length; si++) {
@@ -211,7 +211,7 @@ class PopupMenuHandler implements ActionListener {
 							popup.add(upgradeMenu);
 							upgradeMenuCreated = true;
 						} else {
-							menuItem = new JMenuItem(Ship.OrderToString(orders[j]));
+							menuItem = new JMenuItem(Orders.OrderToString(orders[j]));
 							menuItem.addActionListener(this);
 							popup.add(menuItem);
 							orderItems.put(menuItem, orders[j]);
@@ -226,7 +226,7 @@ class PopupMenuHandler implements ActionListener {
 			Orders[] orders = ((Ship)(GameManager.selectedObj)).getOrders();
 			for(int i = 0; i < orders.length; i++) {
 				if(orders[i] == Orders.UPGRADE) {
-					JMenu upgradeMenu = new JMenu(Ship.OrderToString(orders[i]));
+					JMenu upgradeMenu = new JMenu(Orders.OrderToString(orders[i]));
 					if(!l.isEmptyOrInvisible()) {
 						for(int si = 0; si < s.length; si++) { 
 							if(s[si].getClass() != CapitalShip.class) { // Change this to checking if ship is upgradeable. 
@@ -239,7 +239,7 @@ class PopupMenuHandler implements ActionListener {
 					}
 					popup.add(upgradeMenu);
 				} else {
-					menuItem = new JMenuItem(Ship.OrderToString(orders[i]));
+					menuItem = new JMenuItem(Orders.OrderToString(orders[i]));
 					menuItem.addActionListener(this);
 					popup.add(menuItem);
 					orderItems.put(menuItem, orders[i]);
@@ -248,7 +248,30 @@ class PopupMenuHandler implements ActionListener {
 			popup.addSeparator();
 		}
 		else if(GameManager.selectedObj instanceof Planet) {
-			
+			if(((Planet)GameManager.selectedObj).canBeOrdered()) {
+				Orders[] orders = ((Planet)(GameManager.selectedObj)).getOrders();
+				for (int i = 0; i < orders.length; i++) {
+					if(orders[i] == Orders.UPGRADE) {
+						JMenu upgradeMenu = new JMenu(Orders.OrderToString(orders[i]));
+						if(!l.isEmptyOrInvisible()) {
+							for(int si = 0; si < s.length; si++) {
+								if(s[si].canUpgrade()) {
+									menuItem = new JMenuItem(s[si].getName());
+									menuItem.addActionListener(this);
+									upgradeMenu.add(menuItem);
+									upgradeItems.put(menuItem, s[si]);
+								}
+							}
+						}
+						popup.add(upgradeMenu);
+					} else {
+						menuItem = new JMenuItem(Orders.OrderToString(orders[i]));
+						menuItem.addActionListener(this);
+						popup.add(menuItem);
+						orderItems.put(menuItem, orders[i]);
+					}
+				}
+			}
 		}
 		
 		//Ships at location
@@ -291,6 +314,8 @@ class PopupMenuHandler implements ActionListener {
 				((Location)(GameManager.selectedObj)).assignOrder(order, associatedLoc);
 			} else if(GameManager.selectedObj instanceof Ship) {
 				((Ship)(GameManager.selectedObj)).assignOrder(order, associatedLoc);
+			} else if(GameManager.selectedObj instanceof Planet) {
+				((Planet)(GameManager.selectedObj)).assignOrder(order, null);
 			}
 			GameManager.selectedObj = null;
 		} else if(upgradeItems.containsKey(e.getSource())) {
@@ -311,6 +336,9 @@ class PopupMenuHandler implements ActionListener {
 					s.assignOrder(Orders.UPGRADE, upgradeItems.get(e.getSource()));
 					GameManager.selectedObj = null;
 				}
+			} else if(GameManager.selectedObj instanceof Planet) {
+				((Planet)GameManager.selectedObj).assignOrder(Orders.UPGRADE, upgradeItems.get(e.getSource()));
+				GameManager.selectedObj = null;
 			}
 		} else if(shipItems.containsKey(e.getSource())) {
 			if(GameManager.selectedObj != null) {

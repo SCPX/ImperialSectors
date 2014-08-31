@@ -37,4 +37,9 @@ public class Battleship extends Ship {
 		this._upgrading = false;
 	}
 
+	@Override
+	public boolean canUpgrade() {
+		return false;
+	}
+
 }

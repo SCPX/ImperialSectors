@@ -9,10 +9,9 @@ import javax.swing.JOptionPane;
 import ISectors.engine.Location;
 import ISectors.engine.TurnManager;
 import ISectors.engine.Selectable;
+import ISectors.engine.Orders;
 
 public abstract class Ship implements Selectable {
-	// TODO: Check if there are enemies between you and the target destination. Even if the target destination has enemies in it, if there isn't a clear path, you can't go there.
-		public enum Orders { MOVE, STANDBY, DECOMMISSION, BUILD, UPGRADE }
 		protected int _tier; // Level of power for the ship. Used for upgrading.
 		protected float _firepower; // Ship's general attack. Compared to the enemy's armor for deciding battles.
 		protected float _armor; // Ship's general defense. Compared to the enemy's firepower for deciding battles.
@@ -20,13 +19,16 @@ public abstract class Ship implements Selectable {
 		protected float _speed; // Number of sectors a ship can traverse per turn.
 		protected float _sensors; // Range in sectors that a ship can clear the fog of war.
 		protected Location _location; // Current sector which the ship resides in.
-		protected Fleet _fleet;
+//		protected Fleet _fleet;
 		protected String _shipName; // Stores the name of the type of ship.
 		private boolean _created; // Stores whether or not the unit has been created yet.
 		protected BufferedImage _icon = null; // The image used to represent this ship.
+
+		// Order Data
 		protected Orders _order = Orders.STANDBY;
 		private Location _destination = null;
 		protected Orders[] _availableOrders;
+		
 		protected int _player;
 		protected boolean _upgrading;
 
@@ -48,7 +50,7 @@ public abstract class Ship implements Selectable {
 	 		_location.LeaveSector(this);
 	 		TurnManager.removeShip(this, _player);
 			_tier = -1;
-			_fleet = null;
+			//_fleet = null;
 			_location = null;
 			_created = false;
 		}
@@ -127,13 +129,13 @@ public abstract class Ship implements Selectable {
 			}
 		}
 		
-		public void leaveFleet() {
+/*		public void leaveFleet() {
 			_fleet = null;
 		}
 		
 		public void joinFleet(Fleet f) {
 			_fleet = f;
-		}
+		}*/
 		
 		/**
 		 * Retrieves the icon representation of this ship for GUI purposes.
@@ -276,40 +278,34 @@ public abstract class Ship implements Selectable {
 		public String[] getOrderList() {
 			String[] ordersList = new String[_availableOrders.length];
 			for(int i = 0; i < _availableOrders.length; i++) {
-				ordersList[i] = OrderToString(_availableOrders[i]);
+				ordersList[i] = Orders.OrderToString(_availableOrders[i]);
 			}
 			return ordersList;
 		}
 		
 		/**
-		 * Converts an order into string format
-		 * @param order The order to be printed
-		 * @return Name of order in a String
+		 * Informs this ship that it is to be upgraded.
+		 * @return true if this ship is able to be upgraded.
 		 */
-		public static String OrderToString(Orders order) {
-			String retValue;
-			switch(order) {
-			case MOVE:
-				retValue = "Move To";
-				break;
-			case STANDBY:
-				retValue = "Standby";
-				break;
-			case DECOMMISSION:
-				retValue = "Decommision";
-				break;
-			case UPGRADE: 
-				retValue = "Upgrade";
-				break;
-			case BUILD:
-				retValue = "Build Ship";
-				break;
-			default:
-				retValue = "Unknown Order";
+		public boolean setUpgrading(boolean val) {
+			if(val) {
+				if(this.canUpgrade()) {
+					if(!this.isUpgrading()){
+						_upgrading = true;
+						return true;
+					} else {
+						JOptionPane.showMessageDialog(_location, getName() + " is already set for being upgraded!");
+						return false;
+					}
+				} else {
+					JOptionPane.showMessageDialog(_location, getName() + " can not be upgraded anymore!");
+					return false;
+				}
+			} else {
+				_upgrading = false;
+				return true;
 			}
-			return retValue;
 		}
-		
 		
 		/**
 		 * Generic getter for the firepower variable.
@@ -349,10 +345,7 @@ public abstract class Ship implements Selectable {
 		 * Checks if ship can upgrade, or if ship is not upgradable.
 		 * @return true if ship can be upgraded.
 		 */
-		public boolean canUpgrade() 
-		{
-			return _tier > 0;
-		}
+		public abstract boolean canUpgrade() ;
 		
 		/**
 		 * Generic getter for the sensor variable. Sensor range is determined in the number of 
