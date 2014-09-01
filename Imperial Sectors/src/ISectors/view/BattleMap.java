@@ -272,6 +272,7 @@ class PopupMenuHandler implements ActionListener {
 					}
 				}
 			}
+			popup.addSeparator();
 		}
 		
 		//Ships at location
@@ -357,7 +358,8 @@ class PopupMenuHandler implements ActionListener {
 				GameManager.selectedObj = associatedLoc;
 			}
 		} else if(planetItem == e.getSource()) {
-			GameManager.selectedObj = associatedLoc.getPlanet();
+			if(associatedLoc.getPlanet().getAlliance() == TurnManager.currentPlayer)
+				GameManager.selectedObj = associatedLoc.getPlanet();
 		}
 		parent.repaint();
 	}

@@ -1,7 +1,5 @@
 package ISectors.planets;
 
-import javax.swing.JOptionPane;
-
 import ISectors.engine.Location;
 import ISectors.engine.Orders;
 import ISectors.ships.ScoutShip;
