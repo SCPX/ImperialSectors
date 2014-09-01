@@ -23,7 +23,7 @@ public class Location extends Component implements Selectable {
 	private Planet _planet;
 	private int border = 1;
 	//public boolean selected = false;
-//	private boolean conflicted = false;
+	private boolean conflicted = false;
 
 	public Location(int x, int y) {
 		_col = x;
@@ -64,8 +64,14 @@ public class Location extends Component implements Selectable {
 				g.fillRect(bounds.x + border, bounds.y + border, bounds.width - (2 * border), bounds.height - (2 * border));
 			} else { // Location is not within range of any selected ship, if there are any selected ships.
 				g.setColor(Color.black);
-				//g.fillRect(bounds.x + border, bounds.y + border, bounds.width - (2 * border), bounds.height - (2 * border));
 				g.fillRect(bounds.x, bounds.y, bounds.width, bounds.height);
+			}
+			//Draw Conflict border
+			if(conflicted) {
+				g.setColor(Color.red);
+				for(int i = 0; i < 2; i++) {
+					g.drawRect(bounds.x + i, bounds.y + i, bounds.width - (2 * i), bounds.height - (2 * i));
+				}
 			}
 			//draw fleet/planet
 			if(_planet != null) {
@@ -88,7 +94,7 @@ public class Location extends Component implements Selectable {
 			
 			if(GameManager.selectedObj != null && GameManager.selectedObj.getSelectedLoc() == this) { // This is the selected location. Draw selection border
 				int selectedBorder = 3;
-				g.setColor(Color.red);
+				g.setColor(Color.yellow);
 				for(int i = 0; i < selectedBorder; i++) {
 					g.drawRect(bounds.x + i, bounds.y + i, bounds.width - (2 * i), bounds.height - (2 * i));
 				}
@@ -180,8 +186,10 @@ public class Location extends Component implements Selectable {
 		}
 //		_occupants.removeShip(s);
 		_occupants.remove(s);
-		if(_occupants.isEmpty())
+		if(_occupants.isEmpty()) {
 			TurnManager.removeLocation(this);
+			conflicted = false;
+		}
 
 		return true;
 	}
@@ -310,6 +318,14 @@ public class Location extends Component implements Selectable {
 				fleetCombat[i] -= shipDef;
 				if(debug) System.out.println("Fleet Combat decreased to " + fleetCombat[i]);
 			}
+			
+			if(debug) System.out.println("Remaining number of fleets is " + nFleets);
+			if(nFleets > 1) {
+				conflicted = true;
+			} else 
+			{
+				conflicted = false;
+			}
 			/*if(nFleets > 2) {
 				double[] distribution = new double[nFleets - 1];
 				for(int j = 0; j < nFleets - 1; j++) {
@@ -349,5 +365,9 @@ public class Location extends Component implements Selectable {
 	@Override
 	public Location getSelectedLoc() {
 		return this;
+	}
+	
+	public boolean isConflicted() {
+		return conflicted;
 	}
 }

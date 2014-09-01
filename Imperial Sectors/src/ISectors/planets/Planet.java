@@ -17,7 +17,6 @@ public abstract class Planet implements Selectable {
 	protected String _description;
 	protected int _owner = -1;
 	protected BufferedImage _icon = null;
-	protected boolean _conflicted = false;
 	
 	// Order Data
 	protected boolean _orderable = false;

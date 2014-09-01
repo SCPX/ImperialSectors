@@ -1,5 +1,7 @@
 package ISectors.planets;
 
+import javax.swing.JOptionPane;
+
 import ISectors.engine.Location;
 import ISectors.engine.Orders;
 import ISectors.ships.ScoutShip;
@@ -22,7 +24,7 @@ public class IndustrialPlanet extends Planet {
 
 	@Override
 	public void enactOrders() {
-		if(!_conflicted) {
+		if(!_location.isConflicted()) {
 			if(_order == Orders.BUILD) {
 				ScoutShip s = new ScoutShip(_owner);
 				_location.EnterSector(s);
@@ -37,6 +39,9 @@ public class IndustrialPlanet extends Planet {
 
 	@Override
 	public void assignOrder(Orders order, Ship target) {
+		if(_location.isConflicted()) {
+			JOptionPane.showMessageDialog(_location, "Planet is in a conflicted zone! Can not perform orders!");
+		}
 		if(order == Orders.UPGRADE) {
 			if(target.getLoc() == _location) {
 				if(target.setUpgrading(true)) {
