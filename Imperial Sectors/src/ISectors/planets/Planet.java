@@ -12,10 +12,11 @@ import ISectors.engine.Selectable;
 import ISectors.ships.Ship;
 
 public abstract class Planet implements Selectable {
+	public static final int UNOWNED = -1;
 	protected Location _location;
 	protected String _name;
 	protected String _description;
-	protected int _owner = -1;
+	protected int _owner = UNOWNED;
 	protected BufferedImage _icon = null;
 	
 	// Order Data
@@ -23,6 +24,7 @@ public abstract class Planet implements Selectable {
 	protected Orders _order = Orders.STANDBY;
 	protected Orders[] _availableOrders;
 	protected Ship _orderTarget = null;
+	protected float sensorRange = 1.0f;
 	
 	public Planet(Location loc) {
 		_name = "Planet";
@@ -46,6 +48,9 @@ public abstract class Planet implements Selectable {
 	}
 	
 	public void Invade(int player) {
+		if(player != _owner) {
+			_order = Orders.STANDBY;
+		}
 		_owner = player;
 	}
 	
@@ -89,6 +94,10 @@ public abstract class Planet implements Selectable {
 	
 	public boolean canBeOrdered() {
 		return _orderable;
+	}
+	
+	public float getSensorRange() {
+		return sensorRange;
 	}
 	
 	/**

@@ -2,6 +2,7 @@ package ISectors.engine;
 
 import java.util.ArrayList;
 
+import ISectors.planets.Planet;
 import ISectors.ships.Ship;
 
 /**
@@ -11,6 +12,7 @@ import ISectors.ships.Ship;
 public class TurnManager {
 	private static ArrayList<ArrayList<Ship>> playerFleets;
 	private static ArrayList<Location> activeLocations;
+	private static ArrayList<Planet> planetarySystem;
 	private static Location tempSelectedLoc = null;
 	private static float maxSpeed = 0;
 	
@@ -23,6 +25,7 @@ public class TurnManager {
 	public static void initManager(int nPlayers) {
 		playerFleets = new ArrayList<ArrayList<Ship>>();
 		activeLocations = new ArrayList<Location>();
+		planetarySystem = new ArrayList<Planet>();
 		numPlayers = nPlayers;
 		playerFactions = new boolean[nPlayers];
 		for(int i = 0; i < nPlayers; i++) {
@@ -98,24 +101,35 @@ public class TurnManager {
 			for(int j = 0; j < fleet.size(); j++) {
 				Ship s = fleet.get(j);
 				s.enactOrders();
-//				if(s.isCreated()) addLocation(s.getLoc());
 			}
 		}
 		
 		// Resolve all active Locations
-		System.out.println("Resolving...");
 		for(int loc = 0; loc < activeLocations.size(); loc++) {
 			activeLocations.get(loc).Resolve();
+		}
+		
+		for(int planet = 0; planet < planetarySystem.size(); planet++) {
+			planetarySystem.get(planet).enactOrders();
 		}
 	}
 	
 	public static boolean isLocationVisible(Location l) {
 		if(NoFoW) return true;
 		
+		//Check all ships in player's fleet to see if any are within range.
 		ArrayList<Ship> fleet = playerFleets.get(currentPlayer - 1);
 		for(int i = 0; i < fleet.size(); i++) {
 			Ship s = fleet.get(i);
 			if(Location.distance(s.getLoc(), l) <= s.getSensorRange()) {
+				return true;
+			}
+		}
+		
+		//Check if any are within range of planet as well.
+		for(int p = 0; p < planetarySystem.size(); p++) {
+			Planet planet = planetarySystem.get(p);
+			if(planet.getAlliance() == currentPlayer && Location.distance(planet.getLocation(), l) <= planet.getSensorRange()) {
 				return true;
 			}
 		}
@@ -124,6 +138,16 @@ public class TurnManager {
 	
 	private static void resetTempValues() {
 		tempSelectedLoc = null;
+	}
+	
+	public static void registerPlanet(Planet p) {
+		if(!planetarySystem.contains(p))
+			planetarySystem.add(p);
+	}
+	
+	public static void unregisterPlanet(Planet p) {
+		if(planetarySystem.contains(p))
+			planetarySystem.remove(p);
 	}
 	
 	public static boolean isReachable(Location l) {

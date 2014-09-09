@@ -22,6 +22,7 @@ public class Location extends Component implements Selectable {
 	private ArrayList<Ship> _occupants;
 	private Planet _planet;
 	private int border = 1;
+	private int borderThickness = 3;
 	//public boolean selected = false;
 	private boolean conflicted = false;
 
@@ -68,7 +69,7 @@ public class Location extends Component implements Selectable {
 			}
 			//Draw Conflict border
 			if(conflicted) {
-				g.setColor(Color.red);
+				g.setColor(Color.orange);
 				for(int i = 0; i < 2; i++) {
 					g.drawRect(bounds.x + i, bounds.y + i, bounds.width - (2 * i), bounds.height - (2 * i));
 				}
@@ -79,6 +80,19 @@ public class Location extends Component implements Selectable {
 				_icon = _planet.getIcon();
 				if(_icon != null) {
 					g.drawImage(_icon, bounds.x + border, bounds.y + border, bounds.width - (2 * border), bounds.height - (2 * border), null);
+				}
+				if(_planet.getAlliance() == TurnManager.currentPlayer) {
+					//Draw green border
+					g.setColor(Color.green);
+					for(int i = 0; i < borderThickness; i++) {
+						g.drawRect(bounds.x + i, bounds.y + i, bounds.width - (2 * i), bounds.height - (2 * i));
+					}
+				} else if(_planet.getAlliance() != Planet.UNOWNED) {
+					// Draw red border
+					g.setColor(Color.red);
+					for(int i = 0; i < borderThickness; i++) {
+						g.drawRect(bounds.x + i, bounds.y + i, bounds.width - (2 * i), bounds.height - (2 * i));
+					}
 				}
 			} else if(!_occupants.isEmpty()) {
 				BufferedImage _icon;
@@ -93,9 +107,8 @@ public class Location extends Component implements Selectable {
 			}
 			
 			if(GameManager.selectedObj != null && GameManager.selectedObj.getSelectedLoc() == this) { // This is the selected location. Draw selection border
-				int selectedBorder = 3;
 				g.setColor(Color.yellow);
-				for(int i = 0; i < selectedBorder; i++) {
+				for(int i = 0; i < borderThickness; i++) {
 					g.drawRect(bounds.x + i, bounds.y + i, bounds.width - (2 * i), bounds.height - (2 * i));
 				}
 			}
@@ -153,19 +166,12 @@ public class Location extends Component implements Selectable {
 	}
 	
 	public void EnterSector(Ship s) {
-/*		if(_occupants == null) {
-			_occupants = new Fleet(this);
-			_occupants.addShip(s);
-			// create a fleet for the ship
-		} else {
-			// add ship to fleet
-			_occupants.addShip(s);
-		}//*/
 		_occupants.add(s);
 		if(!s.isCreated()) {
 			s.Create(this);
 		}
 		TurnManager.addLocation(this);
+		
 		// Check if an enemy of s is in this sector.
 		// if so, mark as a conflicted Location
 	}
@@ -263,6 +269,10 @@ public class Location extends Component implements Selectable {
 		
 		if(nFleets <= 1) {
 			if(debug) System.out.println("Only one fleet");
+			if(!_occupants.isEmpty() && _planet != null) {
+				_planet.Invade(_occupants.get(0).getLoyalty());
+			}
+			conflicted = false;
 			return;
 		}
 		
@@ -337,10 +347,20 @@ public class Location extends Component implements Selectable {
 				}
 			}//*/
 		}
+		
+		// If planet, determine planet's allegiance.
+		if(_planet != null && !_occupants.isEmpty() && !conflicted) {
+			if(_occupants.get(0).getLoyalty() != _planet.getAlliance())
+				_planet.Invade(_occupants.get(0).getLoyalty());
+		}
 	}
 	
 	public void setPlanet(Planet p) {
+		if(_planet != null) {
+			TurnManager.unregisterPlanet(_planet);
+		}
 		_planet = p;
+		TurnManager.registerPlanet(_planet);
 	}
 	
 	public Planet getPlanet() {

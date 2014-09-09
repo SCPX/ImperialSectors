@@ -227,7 +227,7 @@ public class BattleWindow extends JFrame implements ActionListener {
 		sizes[1].setColumns(6);
 		
 		txtPlanets = new JFormattedTextField(formatter);//"0", 3);
-		txtPlanets.setText("0");
+		txtPlanets.setText("10");
 		txtPlanets.setColumns(3);
 	
 		JLabel modeLabel = new JLabel("Game Mode:");

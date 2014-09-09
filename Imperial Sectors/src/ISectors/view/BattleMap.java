@@ -165,6 +165,7 @@ class PopupMenuHandler implements ActionListener {
 	private Hashtable<JMenuItem, Orders> orderItems;
 	private Hashtable<JMenuItem, Ship> shipItems;
 	private Hashtable<JMenuItem, Ship> upgradeItems;
+	private Hashtable<JMenuItem, Object> locSpecificItems;
 	private JMenuItem planetItem;
 	private JMenuItem locItem;
 	private Location associatedLoc;
@@ -173,6 +174,7 @@ class PopupMenuHandler implements ActionListener {
 		orderItems = new Hashtable<JMenuItem, Orders>();
 		shipItems = new Hashtable<JMenuItem, Ship>();
 		upgradeItems = new Hashtable<JMenuItem, Ship>();
+		locSpecificItems = new Hashtable<JMenuItem, Object>();
 		parent = par;
 	}
 	
@@ -180,6 +182,7 @@ class PopupMenuHandler implements ActionListener {
 		orderItems.clear();
 		shipItems.clear();
 		upgradeItems.clear();
+		locSpecificItems.clear();
 		planetItem = null;
 		JMenuItem menuItem;
 		popup = new JPopupMenu();
@@ -200,7 +203,7 @@ class PopupMenuHandler implements ActionListener {
 							if(!l.isEmptyOrInvisible())
 							{
 								for(int si = 0; si < s.length; si++) {
-									if(s[si].canUpgrade()) {
+									if(s[si].canUpgrade() && s[si].getLoyalty() == TurnManager.currentPlayer) {
 										menuItem = new JMenuItem(s[si].getName());
 										menuItem.addActionListener(this);
 										upgradeMenu.add(menuItem);
@@ -229,7 +232,7 @@ class PopupMenuHandler implements ActionListener {
 					JMenu upgradeMenu = new JMenu(Orders.OrderToString(orders[i]));
 					if(!l.isEmptyOrInvisible()) {
 						for(int si = 0; si < s.length; si++) { 
-							if(s[si].getClass() != CapitalShip.class) { // Change this to checking if ship is upgradeable. 
+							if(s[si].canUpgrade() && s[si].getLoyalty() == TurnManager.currentPlayer) { // Change this to checking if ship is upgradeable. 
 								menuItem = new JMenuItem(s[si].getName());
 								menuItem.addActionListener(this);
 								upgradeMenu.add(menuItem);
@@ -255,7 +258,7 @@ class PopupMenuHandler implements ActionListener {
 						JMenu upgradeMenu = new JMenu(Orders.OrderToString(orders[i]));
 						if(!l.isEmptyOrInvisible()) {
 							for(int si = 0; si < s.length; si++) {
-								if(s[si].canUpgrade()) {
+								if(s[si].canUpgrade() && s[si].getLoyalty() == TurnManager.currentPlayer) {
 									menuItem = new JMenuItem(s[si].getName());
 									menuItem.addActionListener(this);
 									upgradeMenu.add(menuItem);
@@ -291,11 +294,46 @@ class PopupMenuHandler implements ActionListener {
 		
 		//Planets at location
 		if(l.getPlanet() != null) {
-			menuItem = new JMenuItem(l.getPlanet().getName());
-			menuItem.addActionListener(this);
-			popup.add(menuItem);
-			planetItem = menuItem;
-			popup.addSeparator();
+			if(l.getPlanet().getAlliance() == TurnManager.currentPlayer) {
+				JMenu planetMenu = new JMenu(l.getPlanet().getName());
+				planetMenu.setForeground(Color.green);
+				Orders[] orders = l.getPlanet().getOrders();
+				for(int i = 0; i < orders.length; i++) {
+					if(orders[i] == Orders.UPGRADE) {
+						JMenu upgradeMenu = new JMenu(Orders.OrderToString(orders[i]));
+						if(!l.isEmptyOrInvisible()) {
+							for(int si = 0; si < s.length; si++) {
+								if(s[si].canUpgrade() && s[si].getLoyalty() == TurnManager.currentPlayer) {
+									menuItem = new JMenuItem(s[si].getName());
+									menuItem.addActionListener(this);
+									upgradeMenu.add(menuItem);
+									locSpecificItems.put(menuItem, s[si]);
+								}
+							}
+						}
+						planetMenu.add(upgradeMenu);
+					} else {
+						menuItem = new JMenuItem(Orders.OrderToString(orders[i]));
+						menuItem.addActionListener(this);
+						planetMenu.add(menuItem);
+						locSpecificItems.put(menuItem, orders[i]);
+					}
+				}
+				popup.add(planetMenu);
+			} else if(l.getPlanet().getAlliance() != Planet.UNOWNED) {
+				menuItem = new JMenuItem(l.getPlanet().getName());
+				menuItem.setForeground(Color.red);
+				menuItem.addActionListener(this);
+				popup.add(menuItem);
+				planetItem = menuItem;
+				popup.addSeparator();
+			} else {
+				menuItem = new JMenuItem(l.getPlanet().getName());
+				menuItem.addActionListener(this);
+				popup.add(menuItem);
+				planetItem = menuItem;
+				popup.addSeparator();
+			}
 		}
 		
 		//Location Information
@@ -360,6 +398,15 @@ class PopupMenuHandler implements ActionListener {
 		} else if(planetItem == e.getSource()) {
 			if(associatedLoc.getPlanet().getAlliance() == TurnManager.currentPlayer)
 				GameManager.selectedObj = associatedLoc.getPlanet();
+		} else if(locSpecificItems.containsKey(e.getSource())) {
+			if(locSpecificItems.get(e.getSource()) instanceof Orders) {
+				// Regular order
+				associatedLoc.getPlanet().assignOrder((Orders)(locSpecificItems.get(e.getSource())), null);
+			} else if(locSpecificItems.get(e.getSource()) instanceof Ship) {
+				// Upgrade Order
+				associatedLoc.getPlanet().assignOrder(Orders.UPGRADE, (Ship)(locSpecificItems.get(e.getSource())));
+			}
+			GameManager.selectedObj = null;
 		}
 		parent.repaint();
 	}
