@@ -1,5 +1,6 @@
 package ISectors.engine;
 
+import java.awt.Color;
 import java.util.ArrayList;
 
 import ISectors.planets.Planet;
@@ -10,11 +11,13 @@ import ISectors.ships.Ship;
  *
  */
 public class TurnManager {
+	public static final int MAX_PLAYERS = 10;
 	private static ArrayList<ArrayList<Ship>> playerFleets;
 	private static ArrayList<Location> activeLocations;
 	private static ArrayList<Planet> planetarySystem;
 	private static Location tempSelectedLoc = null;
 	private static float maxSpeed = 0;
+	private static Color[] playerColors = {Color.blue, Color.red, Color.green, Color.yellow, Color.white, Color.cyan, Color.orange, Color.lightGray, Color.magenta, Color.pink};
 	
 	public static boolean NoFoW = false;
 
@@ -175,5 +178,14 @@ public class TurnManager {
 			}
 		}
 		return false;
+	}
+
+	public static void setPlayerColor(int player, Color newColor) {
+		if(newColor != null)
+			playerColors[player - 1] = newColor;
+	}
+	
+	public static Color getPlayerColor(int player) {
+		return playerColors[player - 1];
 	}
 }

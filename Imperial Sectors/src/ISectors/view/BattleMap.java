@@ -282,6 +282,7 @@ class PopupMenuHandler implements ActionListener {
 		if(s != null && s.length > 0) {
 			for(int i = 0; i < s.length; i++) {
 				menuItem = new JMenuItem(s[i].getName());
+				// Maybe show player colors instead of just red?
 				if(s[i].getLoyalty() != TurnManager.currentPlayer) {
 					menuItem.setForeground(Color.red);
 				}
@@ -296,7 +297,7 @@ class PopupMenuHandler implements ActionListener {
 		if(l.getPlanet() != null) {
 			if(l.getPlanet().getAlliance() == TurnManager.currentPlayer) {
 				JMenu planetMenu = new JMenu(l.getPlanet().getName());
-				planetMenu.setForeground(Color.green);
+				planetMenu.setForeground(TurnManager.getPlayerColor(l.getPlanet().getAlliance()));
 				Orders[] orders = l.getPlanet().getOrders();
 				for(int i = 0; i < orders.length; i++) {
 					if(orders[i] == Orders.UPGRADE) {
@@ -322,7 +323,7 @@ class PopupMenuHandler implements ActionListener {
 				popup.add(planetMenu);
 			} else if(l.getPlanet().getAlliance() != Planet.UNOWNED) {
 				menuItem = new JMenuItem(l.getPlanet().getName());
-				menuItem.setForeground(Color.red);
+				menuItem.setForeground(TurnManager.getPlayerColor(l.getPlanet().getAlliance()));
 				menuItem.addActionListener(this);
 				popup.add(menuItem);
 				planetItem = menuItem;

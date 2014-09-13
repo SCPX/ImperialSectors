@@ -81,15 +81,9 @@ public class Location extends Component implements Selectable {
 				if(_icon != null) {
 					g.drawImage(_icon, bounds.x + border, bounds.y + border, bounds.width - (2 * border), bounds.height - (2 * border), null);
 				}
-				if(_planet.getAlliance() == TurnManager.currentPlayer) {
-					//Draw green border
-					g.setColor(Color.green);
-					for(int i = 0; i < borderThickness; i++) {
-						g.drawRect(bounds.x + i, bounds.y + i, bounds.width - (2 * i), bounds.height - (2 * i));
-					}
-				} else if(_planet.getAlliance() != Planet.UNOWNED) {
+				if(_planet.getAlliance() != Planet.UNOWNED) {
 					// Draw red border
-					g.setColor(Color.red);
+					g.setColor(TurnManager.getPlayerColor(_planet.getAlliance()));
 					for(int i = 0; i < borderThickness; i++) {
 						g.drawRect(bounds.x + i, bounds.y + i, bounds.width - (2 * i), bounds.height - (2 * i));
 					}

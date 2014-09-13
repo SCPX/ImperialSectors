@@ -1,5 +1,6 @@
 package ISectors.ships;
 
+import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 
@@ -23,6 +24,7 @@ public abstract class Ship implements Selectable {
 		protected String _shipName; // Stores the name of the type of ship.
 		private boolean _created; // Stores whether or not the unit has been created yet.
 		protected BufferedImage _icon = null; // The image used to represent this ship.
+		private boolean _colored = false; // Used to determine if the icon has been recolored or not.
 
 		// Order Data
 		protected Orders _order = Orders.STANDBY;
@@ -154,6 +156,29 @@ public abstract class Ship implements Selectable {
 				}
 				return icon;
 			}
+
+			if(!_colored) {
+				Color playerColor = TurnManager.getPlayerColor(_player);
+				for(int y = 0; y < _icon.getHeight(); y++) {
+					for(int x = 0; x < _icon.getWidth(); x++) {
+						Color pixel = new Color(_icon.getRGB(x, y), true);
+						
+						if(pixel.getAlpha() > 0) {
+							float[] color1components = pixel.getRGBComponents(null);
+							float[] color2components = playerColor.getRGBColorComponents(null);
+							float[] newColorComponents = new float[3];
+							for(int component = 0; component < 3; component++) {
+								newColorComponents[component] = color1components[component] * color2components[component];
+							}
+							Color newColor;
+							newColor = new Color(newColorComponents[0], newColorComponents[1], newColorComponents[2], color1components[3]);
+
+							_icon.setRGB(x, y, newColor.getRGB());
+						} 
+					}
+				}
+				_colored = true;
+			}
 			// TODO: Rotate ship image
 			return _icon;
 		}
@@ -281,6 +306,14 @@ public abstract class Ship implements Selectable {
 				ordersList[i] = Orders.OrderToString(_availableOrders[i]);
 			}
 			return ordersList;
+		}
+		
+		/**
+		 * Returns the currently assigned order to this ship.
+		 * @return
+		 */
+		public Orders getCurrentOrder() {
+			return _order;
 		}
 		
 		/**
