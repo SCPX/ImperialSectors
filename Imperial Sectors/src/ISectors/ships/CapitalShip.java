@@ -22,7 +22,7 @@ public class CapitalShip extends Ship {
 		super(player);
 		this._armor = 20;
 		this._maxArmor = 20;
-		this._firepower = 0;
+		this._firepower = 50;
 		this._sensors = (float)1.5;
 		this._shipName = "Capitol Ship";
 		this._speed = 1;

@@ -72,7 +72,7 @@ public class BattleWindow extends JFrame implements ActionListener {
 		
 		itmRegenerate.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				GameManager.NewGame(GameManager.Instance.getRows(), GameManager.Instance.getCols(), GameManager.Instance.getGameType(), TurnManager.numPlayers, GameManager.Instance.getNPlanets());
+				GameManager.NewGame(GameManager.Instance.getGameType(), GameManager.Instance.getGameMode(), null, TurnManager.numPlayers, GameManager.Instance.getNPlanets(), GameManager.Instance.getRows(), GameManager.Instance.getCols());
 				BattleMap.Instance.loadBattleMap(GameManager.Instance.getRows(), GameManager.Instance.getCols());
 			}
 		});
@@ -231,7 +231,7 @@ public class BattleWindow extends JFrame implements ActionListener {
 		txtPlanets.setColumns(3);
 	
 		JLabel modeLabel = new JLabel("Game Mode:");
-		String [] options = {"Deathmatch", "Survival", "Domination"};
+		String [] options = GameManager.ModesToStrings();
 		gameSelect = new JComboBox<String>(options);
 		JPanel modePanel = new JPanel();
 		modePanel.add(modeLabel);
@@ -307,7 +307,7 @@ public class BattleWindow extends JFrame implements ActionListener {
 				int nCols = Integer.parseInt(sizes[1].getText());
 				int nPlayers = (Integer)(playerSelect.getSelectedItem());
 				int nPlanets = Integer.parseInt(txtPlanets.getText());
-				GameManager.NewGame(nRows, nCols, GameManager.GameType.LOCAL, nPlayers, nPlanets);
+				GameManager.NewGame(GameManager.GameType.LOCAL,  GameManager.StringToMode((String)gameSelect.getSelectedItem()), null, nPlayers, nPlanets, nRows, nCols);
 				BattleMap.Instance.loadBattleMap(nRows, nCols);
 			} else if(modeSelect.getSelectedItem() == "ONLINE") {
 				System.out.println("Connect to online game?");

@@ -10,9 +10,10 @@ import ISectors.planets.*;
 import ISectors.ships.CapitalShip;
 
 public class GameManager {
-	public static final int port_num = 1717;
+	public static final int PORT_NUM = 1717;
 	public static GameManager Instance;
 	public enum GameType { NETWORK, LOCAL };
+	public enum GameModes { DEATHMATCH, SURVIVAL, DOMINATION, CONQUEST };
 	
 	public static boolean debug = false;
 
@@ -21,7 +22,9 @@ public class GameManager {
 
 	public static Selectable selectedObj = null;
 	
+	private boolean gameOver = false;
 	private GameType gameType;
+	private GameModes gameMode;
 	private Socket sock;
 	private BufferedReader in; // For network use
 	private PrintWriter out; // For Network use
@@ -30,19 +33,34 @@ public class GameManager {
 	private int numCols;
 	private int numPlanets;
 	
+	/**
+	 * Initialize the GameManager.
+	 */
 	public static void Initialize() {
 		if(Instance == null) {
 			Instance = new GameManager();
 		}
 	}
 	
-	public static void NewGame(GameType type, int nPlayers, InetAddress addr) {
-		NewGame(DEFAULT_ROWS, DEFAULT_COLS, type, nPlayers, 0, addr);
-	}
-	
-	public static void NewGame(int nRows, int nCols, GameType type, int nPlayers, int nPlanets, InetAddress addr)
+	/**
+	 * Creates a new Game, given the new game's details.
+	 * @param type What type of game this will be. (LOCAL or NETWORK)
+	 * @param mode What mode is this game. 
+	 * @param addr The IP address to transmit the game to.
+	 * @param nPlayers The number of players involved in this game.
+	 * @param nPlanets The number of planets desired for this game.
+	 * @param nRows The width of the game map.
+	 * @param nCols The height of the game map.
+	 */
+	public static void NewGame(GameType type, GameModes mode, InetAddress addr, int nPlayers, int nPlanets, int nRows, int nCols)
 	{
+		if(type == null || mode == null) {
+			System.err.println("Must select a type and mode!");
+			return;
+		}
 		Instance.gameType = type;
+		Instance.gameMode = mode;
+		if(debug) System.out.println("Mode is " + ModeToString(mode));
 		if(type == GameType.NETWORK) {
 			Instance.setUPConnection(addr);
 			// read number of players from network game
@@ -52,12 +70,67 @@ public class GameManager {
 		}
 
 		Instance.setUpMap(nRows, nCols, nPlanets);
+		Instance.gameOver = false;
 		selectedObj = null;
 		//ISectors.view.BattleMap.Instance.loadBattleMap(nRows, nCols);//Implemented in BattleWindow.
 	}
 	
-	public static void NewGame(int nRows, int nCols, GameType type, int nPlayers, int nPlanets) {
-		NewGame(nRows, nCols, type, nPlayers, nPlanets, null);
+	/**
+	 * Retrieves a list of all the game modes, in string format.
+	 */
+	public static String[] ModesToStrings() {
+		GameModes[] modes = GameModes.values();
+		String[] modeStrings = new String[modes.length];
+		for(int i = 0; i < modes.length; i++) {
+			modeStrings[i] = ModeToString(modes[i]);
+		}
+		return modeStrings;
+	}
+	
+	/**
+	 * Takes a given game mode and returns the string version.
+	 * @param mode The mode to be converted
+	 * @return Returns the string version of the given mode.
+	 */
+	public static String ModeToString(GameModes mode) {
+		switch(mode) {
+		case DEATHMATCH : return "Deathmatch";
+		case SURVIVAL : return "Survival";
+		case DOMINATION : return "Domination";
+		case CONQUEST : return "Conquest";
+		default : return "Unknown";
+		}
+	}
+	
+	/**
+	 * Takes a given string and returns the appropriate mode. If there is no mode matching, we return the default mode of Deathmatch
+	 * @param mode The string that is to be converted
+	 * @return The mode that matches the string.
+	 */
+	public static GameModes StringToMode(String mode) {
+		GameModes[] modes = GameModes.values();
+		for(int i = 0; i < modes.length; i++) {
+			if(mode.equalsIgnoreCase(ModeToString(modes[i]))) {
+				return modes[i];
+			}
+		}
+		return null;
+	}
+	
+	public static void CheckEndGame() {
+		// TODO: Implement game checking code here.
+		switch(Instance.gameMode) {
+		case DOMINATION : 
+			break;
+		case SURVIVAL : 
+			break;
+		case DEATHMATCH : 
+			break;
+		case CONQUEST : 
+		}
+		if(Instance.gameOver) {
+			// TODO: set player to -1, turn off fog of war.
+		}
 	}
 	
 	private GameManager() 
@@ -128,6 +201,7 @@ public class GameManager {
 		
 		// Place Players
 		minDistance = Math.max(numRows, numCols) / TurnManager.numPlayers;
+		maxAttempts = 10; // We wanna try to enforce the player positions a little more strongly than the planets.
 		
 		if(debug) System.out.println("MinDistance for ships is " + minDistance);
 		
@@ -180,7 +254,7 @@ public class GameManager {
 	
 	private void setUPConnection(InetAddress addr) {
 		try{
-			sock = new Socket(addr, port_num);
+			sock = new Socket(addr, PORT_NUM);
 			in = new BufferedReader(new InputStreamReader(sock.getInputStream()));
 			out = new PrintWriter(sock.getOutputStream(), true);
 		} catch(Exception e) {
@@ -208,5 +282,13 @@ public class GameManager {
 	
 	public int getNPlanets() {
 		return numPlanets;
+	}
+	
+	public GameModes getGameMode() {
+		return gameMode;
+	}
+	
+	public boolean isGameOver() {
+		return gameOver;
 	}
 }

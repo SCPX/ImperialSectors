@@ -12,55 +12,46 @@ import ISectors.ships.Ship;
  */
 public class TurnManager {
 	public static final int MAX_PLAYERS = 10;
-	private static ArrayList<ArrayList<Ship>> playerFleets;
+//	private static ArrayList<ArrayList<Ship>> playerFleets;
 	private static ArrayList<Location> activeLocations;
 	private static ArrayList<Planet> planetarySystem;
+	private static ArrayList<Player> players;
 	private static Location tempSelectedLoc = null;
 	private static float maxSpeed = 0;
-	private static Color[] playerColors = {Color.blue, Color.red, Color.green, Color.yellow, Color.white, Color.cyan, Color.orange, Color.lightGray, Color.magenta, Color.pink};
+//	private static Color[] playerColors = {Color.blue, Color.red, Color.green, Color.yellow, Color.white, Color.cyan, Color.orange, Color.lightGray, Color.magenta, Color.pink};
 	
 	public static boolean NoFoW = false;
 
 	public static int numPlayers;
 	public static int currentPlayer = 1;
-	public static boolean[] playerFactions;
+//	public static boolean[] playerFactions;
 	
 	public static void initManager(int nPlayers) {
-		playerFleets = new ArrayList<ArrayList<Ship>>();
+//		playerFleets = new ArrayList<ArrayList<Ship>>();
 		activeLocations = new ArrayList<Location>();
 		planetarySystem = new ArrayList<Planet>();
+		players = new ArrayList<Player>();
 		numPlayers = nPlayers;
-		playerFactions = new boolean[nPlayers];
+//		playerFactions = new boolean[nPlayers];
 		for(int i = 0; i < nPlayers; i++) {
-			ArrayList<Ship> fleet = new ArrayList<Ship>();
-			playerFleets.add(fleet);
-			playerFactions[i] = false;
+			players.add(new Player(i + 1));
 		}
-		playerFactions[0] = true;
 	}
 	
 	public static void setPlayerFaction(int playerNum, boolean isPC) {
-		playerFactions[playerNum - 1] = isPC;
+		players.get(playerNum - 1).setAI(!isPC);
 	}
 	
-	public static boolean isPlayerFaction(int playerNum) {
-		return playerFactions[playerNum - 1];
+	public static Player getPlayer(int playerNum) {
+		return players.get(playerNum);
 	}
 	
 	public static void addShip(Ship s, int player) {
-		ArrayList<Ship> fleet = playerFleets.get(player - 1);
-		fleet.add(s);
-		playerFleets.set(player - 1, fleet);
-		addLocation(s.getLoc());
+		players.get(player).addShip(s);
 	}
 	
 	public static void removeShip(Ship s, int player) {
-		ArrayList<Ship> fleet = playerFleets.get(player - 1);
-		fleet.remove(s);
-		playerFleets.set(player - 1, fleet);
-		if(s.getLoc()!= null) {
-			removeLocation(s.getLoc());
-		}
+		players.get(player).removeShip(s);
 	}
 	
 	public static void removeLocation(Location loc) {
@@ -77,7 +68,7 @@ public class TurnManager {
 		}
 	}
 	
-	public static int playerLoyalty(Ship s) {
+/*	public static int playerLoyalty(Ship s) {
 		for(int i = 0; i < numPlayers; i++) {
 			ArrayList<Ship> fleet = playerFleets.get(i);
 			if(fleet.contains(s)) {
@@ -85,9 +76,11 @@ public class TurnManager {
 			}
 		}
 		return -1;
-	}
+	}//*/
 	
 	public static void nextTurn() {
+		if(GameManager.Instance.isGameOver())
+			return;
 		currentPlayer++;
 		resetTempValues();
 		GameManager.selectedObj = null;
@@ -100,11 +93,7 @@ public class TurnManager {
 	public static void endRound() {
 //		activeLocations.clear();
 		for(int i = 0; i < numPlayers; i++) {
-			ArrayList<Ship> fleet = playerFleets.get(i);
-			for(int j = 0; j < fleet.size(); j++) {
-				Ship s = fleet.get(j);
-				s.enactOrders();
-			}
+			players.get(i).resolveFleets();
 		}
 		
 		// Resolve all active Locations
@@ -121,7 +110,7 @@ public class TurnManager {
 		if(NoFoW) return true;
 		
 		//Check all ships in player's fleet to see if any are within range.
-		ArrayList<Ship> fleet = playerFleets.get(currentPlayer - 1);
+		ArrayList<Ship> fleet = players.get(currentPlayer).getFleet();
 		for(int i = 0; i < fleet.size(); i++) {
 			Ship s = fleet.get(i);
 			if(Location.distance(s.getLoc(), l) <= s.getSensorRange()) {
@@ -130,8 +119,9 @@ public class TurnManager {
 		}
 		
 		//Check if any are within range of planet as well.
-		for(int p = 0; p < planetarySystem.size(); p++) {
-			Planet planet = planetarySystem.get(p);
+		ArrayList<Planet> playerSystems = players.get(currentPlayer).getTerritory();
+		for(int p = 0; p < playerSystems.size(); p++) {
+			Planet planet = playerSystems.get(p);
 			if(planet.getAlliance() == currentPlayer && Location.distance(planet.getLocation(), l) <= planet.getSensorRange()) {
 				return true;
 			}
@@ -182,10 +172,10 @@ public class TurnManager {
 
 	public static void setPlayerColor(int player, Color newColor) {
 		if(newColor != null)
-			playerColors[player - 1] = newColor;
+			players.get(player).AssociatedColor = newColor;
 	}
 	
 	public static Color getPlayerColor(int player) {
-		return playerColors[player - 1];
+		return players.get(player).AssociatedColor;
 	}
 }
