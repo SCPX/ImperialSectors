@@ -1,13 +1,14 @@
 Things still to do:
 Save Game
-Online functionality
+Online functionality - POSTPONED
 AI players
 Implement Planets - DONE
 Implement Stations
-Implement Game Modes
+Implement Game Modes -> end game
 Implement directional speed preference?
 Fix ships to rotate icons towards direction
 Fix icons to change color - DONE
 Create Info panel
 Create Log System
 Fix location to paint multiple ships and not just squad sign
+

@@ -61,14 +61,18 @@ public class BattleMap extends JPanel implements MouseListener, ActionListener {
 		this.setLayout(new GridLayout(_numCols, _numRows));
 		_grid = GameManager.Instance.getGrid();
 		
-		for(int x = 0; x < _numRows; x++) {
-			for(int y = 0; y < _numCols; y++) {
+		for(int y = 0; y < _numCols; y++) {
+			for(int x = 0; x < _numRows; x++) {
 				_grid[x][y].addMouseListener(this);
 				this.add(_grid[x][y]);
 			}
 		}
 		this.validate();
 
+		displayMap = false;
+		repaint();
+		JOptionPane.showMessageDialog(this, "Click Okay when ready to begin.");
+		displayMap = true;
 		repaint();
 	}
 	
@@ -81,8 +85,8 @@ public class BattleMap extends JPanel implements MouseListener, ActionListener {
 //	    int cellHeight = bounds.height / _numCols;
 		
 		if(_grid != null) {
-			for(int x = 0; x < _numRows; x++) {
-				for(int y = 0; y < _numCols; y++) {
+			for(int y = 0; y < _numCols; y++) {
+				for(int x = 0; x < _numRows; x++) {
 					_grid[x][y].paint(g);
 				}
 			}//*/
@@ -136,12 +140,16 @@ public class BattleMap extends JPanel implements MouseListener, ActionListener {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
+		if(GameManager.Instance.isGameOver())
+			return;
 		if(GameManager.Instance.getGameType() == GameType.LOCAL) {
 			TurnManager.nextTurn();
-			displayMap = false;
-			repaint();
-			JOptionPane.showMessageDialog(this, "Player " + TurnManager.currentPlayer + "'s turn.");
-			displayMap = true;
+			if(!GameManager.Instance.isGameOver()) {
+				displayMap = false;
+				repaint();
+				JOptionPane.showMessageDialog(this, TurnManager.getPlayer(TurnManager.currentPlayer).Name + "'s turn.");
+				displayMap = true;
+			}
 		}
 		repaint();
 	}

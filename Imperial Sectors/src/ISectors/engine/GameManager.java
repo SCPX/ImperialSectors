@@ -8,11 +8,11 @@ import javax.swing.JOptionPane;
 import ISectors.planets.*;
 import ISectors.ships.CapitalShip;
 
-public class GameManager {
+public class GameManager extends GameEventHandler {
 	public static final int PORT_NUM = 1717;
 	public static GameManager Instance;
 	public enum GameType { NETWORK, LOCAL };
-	public enum GameModes { DEATHMATCH, SURVIVAL, DOMINATION, CONQUEST };
+	public enum GameModes {  DOMINATION, DEATHMATCH, SURVIVAL, CONQUEST };
 	
 	public static boolean debug = false;
 
@@ -31,6 +31,7 @@ public class GameManager {
 	private int numRows;
 	private int numCols;
 	private int numPlanets;
+	private int winner = -1;
 	
 	/**
 	 * Initialize the GameManager.
@@ -70,6 +71,7 @@ public class GameManager {
 
 		Instance.setUpMap(nRows, nCols, nPlanets);
 		Instance.gameOver = false;
+		Instance.winner = -1;
 		selectedObj = null;
 		//ISectors.view.BattleMap.Instance.loadBattleMap(nRows, nCols);//Implemented in BattleWindow.
 	}
@@ -118,18 +120,35 @@ public class GameManager {
 	
 	public static void CheckEndGame() {
 		// TODO: Implement game checking code here.
+		int winningPlayer = -1;
 		switch(Instance.gameMode) {
-		case DOMINATION : 
+		case DOMINATION : //First player to control >= 75% of all planets in the game.
+			float limit = (float) (Instance.numPlanets) * 0.75f;
+			for(int i = 0; i < TurnManager.numPlayers; i++) {
+				Player p = TurnManager.getPlayer(i + 1);
+				if(p.getTerritory().size() >= limit) {
+					Instance.gameOver = true;
+					winningPlayer = i+1;
+				}
+			}
 			break;
-		case SURVIVAL : 
+		case SURVIVAL : //Game ends when all players have died. (PvE style)
 			break;
-		case DEATHMATCH : 
+		case DEATHMATCH : //Last player to still have his Capital ship wins.
 			break;
-		case CONQUEST : 
+		case CONQUEST : //Last player with any ship alive wins.
 		}
 		if(Instance.gameOver) {
-			// TODO: set player to -1, turn off fog of war.
+			TurnManager.currentPlayer = -1;
+			TurnManager.NoFoW = true;
+			Instance.winner = winningPlayer;
+			Instance.alertListeners(new GameEvent(GameEvent.GAME_OVER));
+			if(debug) System.out.println("Player " + winningPlayer + " wins");
 		}
+	}
+	
+	public static int GetGameWinner() {
+		return Instance.winner;
 	}
 	
 	private GameManager() 
@@ -200,7 +219,7 @@ public class GameManager {
 		
 		// Place Players
 		minDistance = Math.max(numRows, numCols) / TurnManager.numPlayers;
-		maxAttempts = 10; // We wanna try to enforce the player positions a little more strongly than the planets.
+		maxAttempts = 50 / TurnManager.numPlayers; // We wanna try to enforce the player positions a little more strongly than the planets, if there are only a few players.
 		
 		if(debug) System.out.println("MinDistance for ships is " + minDistance);
 		

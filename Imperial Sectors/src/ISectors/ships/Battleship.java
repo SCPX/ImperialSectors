@@ -21,7 +21,7 @@ public class Battleship extends Ship {
 		this._sensors = 1;
 		this._shipName = "Battleship";
 		this._speed = 1;
-		this._tier = 0;
+		this._tier = 5;
 		
 		try{
 			this._icon = ImageIO.read(getClass().getResource("/resources/Battleship.png"));

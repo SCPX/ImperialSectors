@@ -10,12 +10,14 @@ import java.text.NumberFormat;
 import javax.swing.*;
 import javax.swing.text.NumberFormatter;
 
+import ISectors.engine.GameEvent;
+import ISectors.engine.GameEventListener;
 import ISectors.engine.GameManager;
 import ISectors.engine.TurnManager;
 
-public class BattleWindow extends JFrame implements ActionListener {	
+public class BattleWindow extends JFrame implements ActionListener, GameEventListener {	
 	private static final long serialVersionUID = 5149958171543488559L;
-
+	private BattleMap m;
 	/*
 	 * This class will eventually contain other information, such as info panels, and data panels.
 	 * This will also control switching between different menus...Maybe.
@@ -24,11 +26,12 @@ public class BattleWindow extends JFrame implements ActionListener {
 	public BattleWindow() {
 		setSize(480, 480);
 		GameManager.Initialize();
+		GameManager.Instance.addListener(this);
 		initComponents();
 	}
 	
 	public void initComponents() {
-		BattleMap m = new BattleMap();
+		m = new BattleMap();
 		m.setPreferredSize(new Dimension(750, 750));
 		add(m, BorderLayout.CENTER);
 		
@@ -157,6 +160,7 @@ public class BattleWindow extends JFrame implements ActionListener {
 	private JButton[] buttons;
 	private JTable gameList;
 	private Color[] PlayerColors;
+	private boolean[] PlayerAIs;
 
 	private void generateNewGameMenu() {
 		dialog = new JDialog(this, "New Game");
@@ -291,17 +295,20 @@ public class BattleWindow extends JFrame implements ActionListener {
 		playerNames = new JTextField[nPlayers];
 		JButton[] btnColors = new JButton[nPlayers];
 		PlayerColors = new Color[nPlayers];
+		JCheckBox[] PlayerAI = new JCheckBox[nPlayers];
+		PlayerAIs = new boolean[nPlayers];
 		Color[] recColors = {Color.blue, Color.red, Color.green, Color.yellow, Color.white, Color.cyan, Color.orange, Color.lightGray, Color.magenta, Color.pink};
 		
 		for(int i = 0; i < nPlayers; i++) {
 			JPanel panel = new JPanel();
-			panel.setLayout(new GridLayout(2, 2));
+			PlayerColors[i] = recColors[i];
+			PlayerAIs[i] = false;
+			panel.setLayout(new GridLayout(2, 3));
 			panel.setBorder(BorderFactory.createEmptyBorder(2,0,2,0));
 			JLabel lblName = new JLabel("Player " + (i + 1) + "'s Name: ");
 			playerNames[i] = new JTextField("Player " + (i + 1));
 			JLabel lblColor = new JLabel("Player " + (i + 1) + "'s Color: ");
 			btnColors[i] = new JButton();
-			PlayerColors[i] = recColors[i];
 			btnColors[i].setBackground(PlayerColors[i]);
 			btnColors[i].setName("" + i);
 			btnColors[i].addActionListener(new ActionListener() {
@@ -315,8 +322,25 @@ public class BattleWindow extends JFrame implements ActionListener {
 					}
 				}
 			});
+			PlayerAI[i] = new JCheckBox("AI ", false);
+			PlayerAI[i].setName("" + i);
+			PlayerAI[i].addItemListener(new ItemListener() {
+				@Override
+				public void itemStateChanged(ItemEvent e) {
+					int playerNum = Integer.parseInt(((JCheckBox)e.getSource()).getName());
+					if(e.getStateChange() == ItemEvent.SELECTED) {
+						PlayerAIs[playerNum] = true;
+					} else if(e.getStateChange() == ItemEvent.DESELECTED) {
+						PlayerAIs[playerNum] = false;
+					}
+				}
+			});
 			panel.add(lblName);
 			panel.add(playerNames[i]);
+			if(i > 0)
+				panel.add(PlayerAI[i]);
+			else
+				panel.add(new JPanel());
 			panel.add(lblColor);
 			panel.add(btnColors[i]);
 			playerPane.add(panel);
@@ -374,7 +398,7 @@ public class BattleWindow extends JFrame implements ActionListener {
 				for(int i = 0; i < nPlayers; i++) {
 					names[i] = playerNames[i].getText();
 				}
-				TurnManager.setPlayerData(names, PlayerColors);
+				TurnManager.setPlayerData(names, PlayerColors, PlayerAIs);
 			} else if(modeSelect.getSelectedItem() == "ONLINE") {
 				System.out.println("Connect to online game?");
 			}
@@ -387,6 +411,15 @@ public class BattleWindow extends JFrame implements ActionListener {
 			System.out.println("Not implemented yet");
 		} else {
 			System.out.println("Clicked on " + e.getSource());
+		}
+	}
+
+	@Override
+	public void OnGameEventOccurred(GameEvent e) {
+		// TODO Auto-generated method stub
+		if(e.getEventType() == GameEvent.GAME_OVER) {
+			m.repaint();
+			JOptionPane.showMessageDialog(dialog, "Game over!\nPlayer " + GameManager.GetGameWinner() + " wins!");
 		}
 	}
 }

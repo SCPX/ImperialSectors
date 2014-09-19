@@ -32,6 +32,7 @@ public class TurnManager {
 		planetarySystem = new ArrayList<Planet>();
 		players = new ArrayList<Player>();
 		numPlayers = nPlayers;
+		currentPlayer = 1;
 //		playerFactions = new boolean[nPlayers];
 		for(int i = 0; i < nPlayers; i++) {
 			players.add(new Player(i + 1));
@@ -44,14 +45,6 @@ public class TurnManager {
 	
 	public static Player getPlayer(int playerNum) {
 		return players.get(playerNum - 1);
-	}
-	
-	public static void addShip(Ship s, int player) {
-		players.get(player - 1).addShip(s);
-	}
-	
-	public static void removeShip(Ship s, int player) {
-		players.get(player - 1).removeShip(s);
 	}
 	
 	public static void removeLocation(Location loc) {
@@ -68,16 +61,6 @@ public class TurnManager {
 		}
 	}
 	
-/*	public static int playerLoyalty(Ship s) {
-		for(int i = 0; i < numPlayers; i++) {
-			ArrayList<Ship> fleet = playerFleets.get(i);
-			if(fleet.contains(s)) {
-				return i+1;
-			}
-		}
-		return -1;
-	}//*/
-	
 	public static void nextTurn() {
 		if(GameManager.Instance.isGameOver())
 			return;
@@ -87,6 +70,9 @@ public class TurnManager {
 		if(currentPlayer > numPlayers) {
 			endRound();
 			currentPlayer = 1;
+		}
+		if(players.get(currentPlayer - 1).isAI()){
+			players.get(currentPlayer - 1).TakeTurn();
 		}
 	}
 	
@@ -104,6 +90,8 @@ public class TurnManager {
 		for(int planet = 0; planet < planetarySystem.size(); planet++) {
 			planetarySystem.get(planet).enactOrders();
 		}
+		
+		GameManager.CheckEndGame();
 	}
 	
 	public static boolean isLocationVisible(Location l) {
@@ -143,11 +131,12 @@ public class TurnManager {
 			planetarySystem.remove(p);
 	}
 	
-	public static void setPlayerData(String[] names, Color[] colors) {
+	public static void setPlayerData(String[] names, Color[] colors, boolean[] isAi) {
 		for(int i = 0; i < names.length && i < colors.length && i < players.size(); i++) {
 			Player p = players.get(i);
 			p.AssociatedColor = colors[i];
 			p.Name = names[i];
+			p.setAI(isAi[i]);
 		}
 	}
 	

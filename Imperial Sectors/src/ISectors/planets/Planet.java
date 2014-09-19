@@ -9,6 +9,7 @@ import javax.swing.JOptionPane;
 import ISectors.engine.Location;
 import ISectors.engine.Orders;
 import ISectors.engine.Selectable;
+import ISectors.engine.TurnManager;
 import ISectors.ships.Ship;
 
 public abstract class Planet implements Selectable {
@@ -50,6 +51,9 @@ public abstract class Planet implements Selectable {
 	public void Invade(int player) {
 		if(player != _owner) {
 			_order = Orders.STANDBY;
+			if(_owner != UNOWNED) 
+				TurnManager.getPlayer(_owner).removePlanet(this);
+			TurnManager.getPlayer(player).addPlanet(this);
 		}
 		_owner = player;
 	}

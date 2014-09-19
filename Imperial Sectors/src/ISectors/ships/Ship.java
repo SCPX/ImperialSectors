@@ -50,7 +50,7 @@ public abstract class Ship implements Selectable {
 	 	public void Destroy()
 		{
 	 		_location.LeaveSector(this);
-	 		TurnManager.removeShip(this, _player);
+	 		TurnManager.getPlayer(_player).removeShip(this);
 			_tier = -1;
 			//_fleet = null;
 			_location = null;
@@ -67,7 +67,7 @@ public abstract class Ship implements Selectable {
 		public void Create(Location location)//, Player alignment)
 		{
 			this._location = location;
-			TurnManager.addShip(this, _player);
+			TurnManager.getPlayer(_player).addShip(this);
 			_created = true;
 		}
 		
