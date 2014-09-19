@@ -43,15 +43,15 @@ public class TurnManager {
 	}
 	
 	public static Player getPlayer(int playerNum) {
-		return players.get(playerNum);
+		return players.get(playerNum - 1);
 	}
 	
 	public static void addShip(Ship s, int player) {
-		players.get(player).addShip(s);
+		players.get(player - 1).addShip(s);
 	}
 	
 	public static void removeShip(Ship s, int player) {
-		players.get(player).removeShip(s);
+		players.get(player - 1).removeShip(s);
 	}
 	
 	public static void removeLocation(Location loc) {
@@ -110,7 +110,7 @@ public class TurnManager {
 		if(NoFoW) return true;
 		
 		//Check all ships in player's fleet to see if any are within range.
-		ArrayList<Ship> fleet = players.get(currentPlayer).getFleet();
+		ArrayList<Ship> fleet = players.get(currentPlayer - 1).getFleet();
 		for(int i = 0; i < fleet.size(); i++) {
 			Ship s = fleet.get(i);
 			if(Location.distance(s.getLoc(), l) <= s.getSensorRange()) {
@@ -119,7 +119,7 @@ public class TurnManager {
 		}
 		
 		//Check if any are within range of planet as well.
-		ArrayList<Planet> playerSystems = players.get(currentPlayer).getTerritory();
+		ArrayList<Planet> playerSystems = players.get(currentPlayer - 1).getTerritory();
 		for(int p = 0; p < playerSystems.size(); p++) {
 			Planet planet = playerSystems.get(p);
 			if(planet.getAlliance() == currentPlayer && Location.distance(planet.getLocation(), l) <= planet.getSensorRange()) {
@@ -141,6 +141,14 @@ public class TurnManager {
 	public static void unregisterPlanet(Planet p) {
 		if(planetarySystem.contains(p))
 			planetarySystem.remove(p);
+	}
+	
+	public static void setPlayerData(String[] names, Color[] colors) {
+		for(int i = 0; i < names.length && i < colors.length && i < players.size(); i++) {
+			Player p = players.get(i);
+			p.AssociatedColor = colors[i];
+			p.Name = names[i];
+		}
 	}
 	
 	public static boolean isReachable(Location l) {
@@ -172,10 +180,10 @@ public class TurnManager {
 
 	public static void setPlayerColor(int player, Color newColor) {
 		if(newColor != null)
-			players.get(player).AssociatedColor = newColor;
+			players.get(player - 1).AssociatedColor = newColor;
 	}
 	
 	public static Color getPlayerColor(int player) {
-		return players.get(player).AssociatedColor;
+		return players.get(player - 1).AssociatedColor;
 	}
 }

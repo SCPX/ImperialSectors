@@ -3,6 +3,8 @@ package ISectors.view;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.text.NumberFormat;
 
 import javax.swing.*;
@@ -144,18 +146,21 @@ public class BattleWindow extends JFrame implements ActionListener {
 	
 	private JDialog dialog;
 	private JPanel displayPane;
+	private JPanel playerPane;
 	private JComboBox<String> modeSelect;
 	private JComboBox<String> gameSelect;
 	private JLabel[] labels;
 	private JComboBox<Integer> playerSelect;
 	private JFormattedTextField txtPlanets;
 	private JFormattedTextField[] sizes;
+	private JTextField[] playerNames;
 	private JButton[] buttons;
 	private JTable gameList;
-	
+	private Color[] PlayerColors;
+
 	private void generateNewGameMenu() {
 		dialog = new JDialog(this, "New Game");
-		dialog.setSize(200, 80);
+		dialog.setSize(250, 150);
 		dialog.setModal(true);
 		dialog.setLayout(new BoxLayout(dialog.getContentPane(), BoxLayout.PAGE_AXIS));
 
@@ -167,12 +172,12 @@ public class BattleWindow extends JFrame implements ActionListener {
 		buttons[1].addActionListener(this);
 		
 		JLabel modeLabel = new JLabel("Game Type:");
-		String[] options = {"LOCAL", "ONLINE"};
+		String[] options = {"LOCAL"};//, "ONLINE"};
 		modeSelect = new JComboBox<String>(options);
 		modeSelect.setSelectedIndex(0);
-		modeSelect.addActionListener(new ActionListener() {
+		modeSelect.addItemListener(new ItemListener() {
 			@Override
-			public void actionPerformed(ActionEvent arg0) {
+			public void itemStateChanged(ItemEvent arg0) {
 				// Swap out Local and Online display.
 				displayPane.removeAll();
 				if(modeSelect.getSelectedItem() == "LOCAL") {
@@ -209,9 +214,27 @@ public class BattleWindow extends JFrame implements ActionListener {
 		labels[3] = new JLabel("Width:");
 		labels[4] = new JLabel("Height:");
 		
+		playerPane = new JPanel();
+		playerPane.setLayout(new BoxLayout(playerPane, BoxLayout.PAGE_AXIS));
+		
+		JScrollPane jspane = new JScrollPane(playerPane);
+		jspane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		
 		Integer[] choices = {2, 3, 4, 5, 6, 7, 8, 9, 10};
 		playerSelect = new JComboBox<Integer>(choices);
 		playerSelect.setSelectedIndex(0);
+		playerSelect.addItemListener(new ItemListener() {
+			@Override
+			public void itemStateChanged(ItemEvent arg0) {
+				playerPane.removeAll();
+				createPlayerPanel();
+				playerPane.revalidate();
+				dialog.validate();
+				dialog.pack();
+			}
+		});
+		
+		createPlayerPanel();
 		
 		NumberFormatter formatter = new NumberFormatter(NumberFormat.getInstance());
 		formatter.setValueClass(Integer.class);
@@ -242,6 +265,7 @@ public class BattleWindow extends JFrame implements ActionListener {
 		p.add(labels[0]);
 		p.add(playerSelect);
 		pane.add(p);
+		pane.add(jspane);
 		p = new JPanel();
 		p.add(labels[1]);
 		p.add(txtPlanets);
@@ -260,6 +284,43 @@ public class BattleWindow extends JFrame implements ActionListener {
 		btnPanel.add(buttons[0]);
 		btnPanel.add(buttons[1]);
 		pane.add(btnPanel);
+	}
+	
+	private void createPlayerPanel() {
+		int nPlayers = (Integer)playerSelect.getSelectedItem();
+		playerNames = new JTextField[nPlayers];
+		JButton[] btnColors = new JButton[nPlayers];
+		PlayerColors = new Color[nPlayers];
+		Color[] recColors = {Color.blue, Color.red, Color.green, Color.yellow, Color.white, Color.cyan, Color.orange, Color.lightGray, Color.magenta, Color.pink};
+		
+		for(int i = 0; i < nPlayers; i++) {
+			JPanel panel = new JPanel();
+			panel.setLayout(new GridLayout(2, 2));
+			panel.setBorder(BorderFactory.createEmptyBorder(2,0,2,0));
+			JLabel lblName = new JLabel("Player " + (i + 1) + "'s Name: ");
+			playerNames[i] = new JTextField("Player " + (i + 1));
+			JLabel lblColor = new JLabel("Player " + (i + 1) + "'s Color: ");
+			btnColors[i] = new JButton();
+			PlayerColors[i] = recColors[i];
+			btnColors[i].setBackground(PlayerColors[i]);
+			btnColors[i].setName("" + i);
+			btnColors[i].addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent arg0) {
+					int playerNum = Integer.parseInt(((JButton)arg0.getSource()).getName());
+					Color newColor = JColorChooser.showDialog(dialog, "Choose player " + playerNum + "'s color", PlayerColors[playerNum]);
+					if(newColor != null) {
+						PlayerColors[playerNum] = newColor;
+						((JButton)arg0.getSource()).setBackground(newColor);
+					}
+				}
+			});
+			panel.add(lblName);
+			panel.add(playerNames[i]);
+			panel.add(lblColor);
+			panel.add(btnColors[i]);
+			playerPane.add(panel);
+		}
 	}
 
 	private void createOnlineData(JPanel pane) {
@@ -309,6 +370,11 @@ public class BattleWindow extends JFrame implements ActionListener {
 				int nPlanets = Integer.parseInt(txtPlanets.getText());
 				GameManager.NewGame(GameManager.GameType.LOCAL,  GameManager.StringToMode((String)gameSelect.getSelectedItem()), null, nPlayers, nPlanets, nRows, nCols);
 				BattleMap.Instance.loadBattleMap(nRows, nCols);
+				String[] names = new String[nPlayers];
+				for(int i = 0; i < nPlayers; i++) {
+					names[i] = playerNames[i].getText();
+				}
+				TurnManager.setPlayerData(names, PlayerColors);
 			} else if(modeSelect.getSelectedItem() == "ONLINE") {
 				System.out.println("Connect to online game?");
 			}

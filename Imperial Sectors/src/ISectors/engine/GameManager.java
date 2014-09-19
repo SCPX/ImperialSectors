@@ -1,6 +1,5 @@
 package ISectors.engine;
 
-import java.io.*;
 import java.net.*;
 import java.util.Random;
 
@@ -25,9 +24,9 @@ public class GameManager {
 	private boolean gameOver = false;
 	private GameType gameType;
 	private GameModes gameMode;
-	private Socket sock;
-	private BufferedReader in; // For network use
-	private PrintWriter out; // For Network use
+	//private Socket sock;
+	//private BufferedReader in; // For network use
+	//private PrintWriter out; // For Network use
 	private Location[][] _grid;
 	private int numRows;
 	private int numCols;
@@ -254,9 +253,9 @@ public class GameManager {
 	
 	private void setUPConnection(InetAddress addr) {
 		try{
-			sock = new Socket(addr, PORT_NUM);
-			in = new BufferedReader(new InputStreamReader(sock.getInputStream()));
-			out = new PrintWriter(sock.getOutputStream(), true);
+//			sock = new Socket(addr, PORT_NUM);
+//			in = new BufferedReader(new InputStreamReader(sock.getInputStream()));
+//			out = new PrintWriter(sock.getOutputStream(), true);
 		} catch(Exception e) {
 			JOptionPane.showMessageDialog(null, "Could not connect");
 			System.out.println("Could not connect.");
