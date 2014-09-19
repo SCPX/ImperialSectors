@@ -2,7 +2,6 @@
 <qualifiedTypeNameHistroy>
 <fullyQualifiedTypeName name="java.awt.BorderLayout"/>
 <fullyQualifiedTypeName name="java.awt.Graphics"/>
-<fullyQualifiedTypeName name="java.awt.Color"/>
 <fullyQualifiedTypeName name="java.awt.Component"/>
 <fullyQualifiedTypeName name="java.awt.event.MouseListener"/>
 <fullyQualifiedTypeName name="java.awt.GridLayout"/>
@@ -27,8 +26,6 @@
 <fullyQualifiedTypeName name="javax.swing.JMenu"/>
 <fullyQualifiedTypeName name="ISectors.ships.ScoutShip"/>
 <fullyQualifiedTypeName name="ISectors.Frigate"/>
-<fullyQualifiedTypeName name="java.util.ArrayList"/>
-<fullyQualifiedTypeName name="ISectors.ships.Ship"/>
 <fullyQualifiedTypeName name="java.util.Hashtable"/>
 <fullyQualifiedTypeName name="ISectors.TurnManager"/>
 <fullyQualifiedTypeName name="java.lang.Math"/>
@@ -44,10 +41,16 @@
 <fullyQualifiedTypeName name="ISectors.BattleMap"/>
 <fullyQualifiedTypeName name="ISectors.Location"/>
 <fullyQualifiedTypeName name="java.awt.image.BufferedImage"/>
-<fullyQualifiedTypeName name="ISectors.view.BattleWindow"/>
 <fullyQualifiedTypeName name="java.text.NumberFormat"/>
 <fullyQualifiedTypeName name="javax.swing.text.NumberFormatter"/>
+<fullyQualifiedTypeName name="ISectors.engine.Location"/>
+<fullyQualifiedTypeName name="ISectors.engine.GameManager.GameModes"/>
+<fullyQualifiedTypeName name="ISectors.engine.GameManager.GameType"/>
+<fullyQualifiedTypeName name="java.util.ArrayList"/>
+<fullyQualifiedTypeName name="ISectors.ships.Ship"/>
 <fullyQualifiedTypeName name="ISectors.planets.Planet"/>
 <fullyQualifiedTypeName name="ISectors.engine.TurnManager"/>
-<fullyQualifiedTypeName name="ISectors.engine.Location"/>
+<fullyQualifiedTypeName name="java.awt.Color"/>
+<fullyQualifiedTypeName name="ISectors.view.BattleWindow"/>
+<fullyQualifiedTypeName name="java.awt.event.ItemListener"/>
 </qualifiedTypeNameHistroy>
