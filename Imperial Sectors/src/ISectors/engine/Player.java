@@ -8,7 +8,7 @@ import ISectors.ships.Ship;
 
 public class Player {
 	public String Name;
-	public Color AssociatedColor;
+	private Color AssociatedColor;
 	private boolean _isAI = false;
 	private int playerNumber;
 	private ArrayList<Ship> fleet;
@@ -56,6 +56,17 @@ public class Player {
 		return territory.contains(planet);
 	}
 	
+	public Color getColor() {
+		return AssociatedColor;
+	}
+	
+	public void setColor(Color newColor) {
+		AssociatedColor = newColor;
+		for(Ship s : fleet) {
+			s.reloadIcon();
+		}
+	}
+	
 	public boolean isAI() {
 		return _isAI;
 	}
@@ -80,5 +91,15 @@ public class Player {
 		for(int i = 0; i < fleet.size(); i++) {
 			fleet.get(i).enactOrders();
 		}
+	}
+	
+	public void TakeTurn() {
+		if(!_isAI) {
+			return;
+		}
+		
+		if(GameManager.debug) System.out.println("Player " + playerNumber + " is taking it's turn.");
+		
+		TurnManager.nextTurn();
 	}
 }

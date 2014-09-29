@@ -68,7 +68,9 @@ public class BattleMap extends JPanel implements MouseListener, ActionListener {
 			}
 		}
 		this.validate();
-
+	}
+	
+	public void startGame() {
 		displayMap = false;
 		repaint();
 		JOptionPane.showMessageDialog(this, "Click Okay when ready to begin.");
@@ -100,33 +102,33 @@ public class BattleMap extends JPanel implements MouseListener, ActionListener {
 			Location l = (Location) e.getComponent();
 			if(e.getButton() == MouseEvent.BUTTON1) {
 				if(e.isShiftDown()) {
-					if(GameManager.selectedObj instanceof Location) {
-						Location loc = (Location)(GameManager.selectedObj);
+					if(GameManager.getSelectedObj() instanceof Location) {
+						Location loc = (Location)(GameManager.getSelectedObj());
 						loc.assignOrder(Orders.MOVE, l);
-						GameManager.selectedObj = null;
-					} else if(GameManager.selectedObj instanceof Ship) {
-						((Ship)(GameManager.selectedObj)).assignOrder(Orders.MOVE, l);
-						GameManager.selectedObj = null;
+						GameManager.selectObj(null);
+					} else if(GameManager.getSelectedObj() instanceof Ship) {
+						((Ship)(GameManager.getSelectedObj())).assignOrder(Orders.MOVE, l);
+						GameManager.selectObj(null);
 					}
 				} else {
-					if(GameManager.selectedObj != null) {
-						GameManager.selectedObj = null;
+					if(GameManager.getSelectedObj() != null) {
+						GameManager.selectObj(null);
 					}
 					// Below should be adjusted so we can select enemies, but not give them orders.
-					if(!l.isEmptyOrInvisible() && l.Allegiance() == TurnManager.currentPlayer) {
-						GameManager.selectedObj = l;
+					if(!l.isEmptyOrInvisible()) { //  && l.Allegiance() == TurnManager.currentPlayer
+						GameManager.selectObj(l);
 					}
 				}
 			}
 			else if(e.getButton() == MouseEvent.BUTTON3) {
 				// Send order to ships at selectedLoc to move to l
-				if(e.isShiftDown() && GameManager.selectedObj != null) {
-					if(GameManager.selectedObj instanceof Location) {
-						((Location)(GameManager.selectedObj)).assignOrder(Orders.MOVE, l);
-						GameManager.selectedObj = null;
-					} else if(GameManager.selectedObj instanceof Ship) {
-						((Ship)(GameManager.selectedObj)).assignOrder(Orders.MOVE, l);
-						GameManager.selectedObj = null;
+				if(e.isShiftDown() && GameManager.getSelectedObj() != null) {
+					if(GameManager.getSelectedObj() instanceof Location) {
+						((Location)(GameManager.getSelectedObj())).assignOrder(Orders.MOVE, l);
+						GameManager.selectObj(null);
+					} else if(GameManager.getSelectedObj() instanceof Ship) {
+						((Ship)(GameManager.getSelectedObj())).assignOrder(Orders.MOVE, l);
+						GameManager.selectObj(null);
 					}
 				} else {
 					popupHandler.generatePopUp(l).show(e.getComponent(), e.getX(), e.getY());
@@ -197,15 +199,17 @@ class PopupMenuHandler implements ActionListener {
 		Ship[] s = l.getOccupants();
 
 		/*** AVAILABLE ORDERS FOR SELECTED SHIPS ***/
-		if(GameManager.selectedObj instanceof Location && !((Location)(GameManager.selectedObj)).isEmptyOrInvisible()) {
-			Ship[] ships = ((Location)(GameManager.selectedObj)).getOccupants();
+		if(GameManager.getSelectedObj() instanceof Location && !((Location)(GameManager.getSelectedObj())).isEmptyOrInvisible()) {
+			Ship[] ships = ((Location)(GameManager.getSelectedObj())).getOccupants();
 			boolean upgradeMenuCreated = false;
 			Orders[] orders;
 			for(int i = 0; i < ships.length; i++) {
+				if(ships[i].getLoyalty() != TurnManager.currentPlayer)
+					continue;
 				orders = ships[i].getOrders();
 				for(int j = 0; j < orders.length; j++) {
 					if(!orderItems.containsValue(orders[j]) && (orders[j] != Orders.UPGRADE || !upgradeMenuCreated)) {
-						if(orders[j] == Orders.UPGRADE) {
+						if(orders[j] == Orders.UPGRADE ) {
 							// Add a submenu with a list of ships to upgrade
 							JMenu upgradeMenu = new JMenu(Orders.OrderToString(orders[j]));
 							if(!l.isEmptyOrInvisible())
@@ -232,35 +236,37 @@ class PopupMenuHandler implements ActionListener {
 			}
 			popup.addSeparator();
 		} /*** AVAILABLE ORDERS FOR SELECTED LOCATION ***/
-		else if(GameManager.selectedObj instanceof Ship) {
-			// Should we only show upgrade order if only the capital ship is selected, and not if an entire location is selected?
-			Orders[] orders = ((Ship)(GameManager.selectedObj)).getOrders();
-			for(int i = 0; i < orders.length; i++) {
-				if(orders[i] == Orders.UPGRADE) {
-					JMenu upgradeMenu = new JMenu(Orders.OrderToString(orders[i]));
-					if(!l.isEmptyOrInvisible()) {
-						for(int si = 0; si < s.length; si++) { 
-							if(s[si].canUpgrade() && s[si].getLoyalty() == TurnManager.currentPlayer) { // Change this to checking if ship is upgradeable. 
-								menuItem = new JMenuItem(s[si].getName());
-								menuItem.addActionListener(this);
-								upgradeMenu.add(menuItem);
-								upgradeItems.put(menuItem, s[si]);
+		else if(GameManager.getSelectedObj() instanceof Ship) {
+			if(((Ship)GameManager.getSelectedObj()).getLoyalty() == TurnManager.currentPlayer) {
+				// Should we only show upgrade order if only the capital ship is selected, and not if an entire location is selected?
+				Orders[] orders = ((Ship)(GameManager.getSelectedObj())).getOrders();
+				for(int i = 0; i < orders.length; i++) {
+					if(orders[i] == Orders.UPGRADE) {
+						JMenu upgradeMenu = new JMenu(Orders.OrderToString(orders[i]));
+						if(!l.isEmptyOrInvisible()) {
+							for(int si = 0; si < s.length; si++) { 
+								if(s[si].canUpgrade() && s[si].getLoyalty() == TurnManager.currentPlayer) { // Change this to checking if ship is upgradeable. 
+									menuItem = new JMenuItem(s[si].getName());
+									menuItem.addActionListener(this);
+									upgradeMenu.add(menuItem);
+									upgradeItems.put(menuItem, s[si]);
+								}
 							}
 						}
+						popup.add(upgradeMenu);
+					} else {
+						menuItem = new JMenuItem(Orders.OrderToString(orders[i]));
+						menuItem.addActionListener(this);
+						popup.add(menuItem);
+						orderItems.put(menuItem, orders[i]);
 					}
-					popup.add(upgradeMenu);
-				} else {
-					menuItem = new JMenuItem(Orders.OrderToString(orders[i]));
-					menuItem.addActionListener(this);
-					popup.add(menuItem);
-					orderItems.put(menuItem, orders[i]);
 				}
+				popup.addSeparator();
 			}
-			popup.addSeparator();
 		}
-		else if(GameManager.selectedObj instanceof Planet) {
-			if(((Planet)GameManager.selectedObj).canBeOrdered()) {
-				Orders[] orders = ((Planet)(GameManager.selectedObj)).getOrders();
+		else if(GameManager.getSelectedObj() instanceof Planet) {
+			if(((Planet)GameManager.getSelectedObj()).canBeOrdered() && (((Planet)GameManager.getSelectedObj()).getAlliance() == TurnManager.currentPlayer)) {
+				Orders[] orders = ((Planet)(GameManager.getSelectedObj())).getOrders();
 				for (int i = 0; i < orders.length; i++) {
 					if(orders[i] == Orders.UPGRADE) {
 						JMenu upgradeMenu = new JMenu(Orders.OrderToString(orders[i]));
@@ -358,55 +364,55 @@ class PopupMenuHandler implements ActionListener {
 	public void actionPerformed(ActionEvent e) {
 		if(orderItems.containsKey(e.getSource())) {
 			Orders order = orderItems.get(e.getSource());
-			if(GameManager.selectedObj instanceof Location) {
-				((Location)(GameManager.selectedObj)).assignOrder(order, associatedLoc);
-			} else if(GameManager.selectedObj instanceof Ship) {
-				((Ship)(GameManager.selectedObj)).assignOrder(order, associatedLoc);
-			} else if(GameManager.selectedObj instanceof Planet) {
-				((Planet)(GameManager.selectedObj)).assignOrder(order, null);
+			if(GameManager.getSelectedObj() instanceof Location) {
+				((Location)(GameManager.getSelectedObj())).assignOrder(order, associatedLoc);
+			} else if(GameManager.getSelectedObj() instanceof Ship) {
+				((Ship)(GameManager.getSelectedObj())).assignOrder(order, associatedLoc);
+			} else if(GameManager.getSelectedObj() instanceof Planet) {
+				((Planet)(GameManager.getSelectedObj())).assignOrder(order, null);
 			}
-			GameManager.selectedObj = null;
+			GameManager.selectObj(null);
 		} else if(upgradeItems.containsKey(e.getSource())) {
-			if(GameManager.selectedObj instanceof Location) {
+			if(GameManager.getSelectedObj() instanceof Location) {
 				// retrieve CapitalShip from location
-				Ship[] ships = ((Location)(GameManager.selectedObj)).getOccupants();
+				Ship[] ships = ((Location)(GameManager.getSelectedObj())).getOccupants();
 				for(int i = 0; i < ships.length; i++) {
 					if(ships[i].getClass() == CapitalShip.class) {
 						CapitalShip s = (CapitalShip) ships[i];
 						s.assignOrder(Orders.UPGRADE, upgradeItems.get(e.getSource()));
-						GameManager.selectedObj = null;
+						GameManager.selectObj(null);
 						break;
 					}
 				}
-			} else if(GameManager.selectedObj instanceof Ship) {
-				if(GameManager.selectedObj.getClass() == CapitalShip.class) {
-					CapitalShip s = (CapitalShip) GameManager.selectedObj;
+			} else if(GameManager.getSelectedObj() instanceof Ship) {
+				if(GameManager.getSelectedObj().getClass() == CapitalShip.class) {
+					CapitalShip s = (CapitalShip) GameManager.getSelectedObj();
 					s.assignOrder(Orders.UPGRADE, upgradeItems.get(e.getSource()));
-					GameManager.selectedObj = null;
+					GameManager.selectObj(null);
 				}
-			} else if(GameManager.selectedObj instanceof Planet) {
-				((Planet)GameManager.selectedObj).assignOrder(Orders.UPGRADE, upgradeItems.get(e.getSource()));
-				GameManager.selectedObj = null;
+			} else if(GameManager.getSelectedObj() instanceof Planet) {
+				((Planet)GameManager.getSelectedObj()).assignOrder(Orders.UPGRADE, upgradeItems.get(e.getSource()));
+				GameManager.selectObj(null);
 			}
 		} else if(shipItems.containsKey(e.getSource())) {
-			if(GameManager.selectedObj != null) {
-				GameManager.selectedObj = null;
+			if(GameManager.getSelectedObj() != null) {
+				GameManager.selectObj(null);
 			}
 			Ship s = shipItems.get(e.getSource());
-			if(s.getLoyalty() == TurnManager.currentPlayer) {
-				GameManager.selectedObj = s;
-			}
+//			if(s.getLoyalty() == TurnManager.currentPlayer) {
+			GameManager.selectObj(s);
+//			}
 		} else if(locItem == e.getSource()) {
-			if(GameManager.selectedObj != null) {
-				GameManager.selectedObj = null;
+			if(GameManager.getSelectedObj() != null) {
+				GameManager.selectObj(null);
 			}
 			//Below should be modified to allow us to select the location for the non-friendly forces, but not give orders.
-			if(!associatedLoc.isEmptyOrInvisible()) {
-				GameManager.selectedObj = associatedLoc;
+			if(!associatedLoc.isInvisible()) {
+				GameManager.selectObj(associatedLoc);
 			}
 		} else if(planetItem == e.getSource()) {
-			if(associatedLoc.getPlanet().getAlliance() == TurnManager.currentPlayer)
-				GameManager.selectedObj = associatedLoc.getPlanet();
+//			if(associatedLoc.getPlanet().getAlliance() == TurnManager.currentPlayer)
+			GameManager.selectObj(associatedLoc.getPlanet());
 		} else if(locSpecificItems.containsKey(e.getSource())) {
 			if(locSpecificItems.get(e.getSource()) instanceof Orders) {
 				// Regular order
@@ -415,7 +421,7 @@ class PopupMenuHandler implements ActionListener {
 				// Upgrade Order
 				associatedLoc.getPlanet().assignOrder(Orders.UPGRADE, (Ship)(locSpecificItems.get(e.getSource())));
 			}
-			GameManager.selectedObj = null;
+			GameManager.selectObj(null);
 		}
 		parent.repaint();
 	}

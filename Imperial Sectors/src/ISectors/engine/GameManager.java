@@ -19,7 +19,7 @@ public class GameManager extends GameEventHandler {
 	public static final int DEFAULT_ROWS = 25;
 	public static final int DEFAULT_COLS = 25;
 
-	public static Selectable selectedObj = null;
+	private Selectable selectedObj = null;
 	
 	private boolean gameOver = false;
 	private GameType gameType;
@@ -72,7 +72,7 @@ public class GameManager extends GameEventHandler {
 		Instance.setUpMap(nRows, nCols, nPlanets);
 		Instance.gameOver = false;
 		Instance.winner = -1;
-		selectedObj = null;
+		Instance.selectedObj = null;
 		//ISectors.view.BattleMap.Instance.loadBattleMap(nRows, nCols);//Implemented in BattleWindow.
 	}
 	
@@ -149,6 +149,15 @@ public class GameManager extends GameEventHandler {
 	
 	public static int GetGameWinner() {
 		return Instance.winner;
+	}
+
+	public static void selectObj(Selectable obj) {
+		Instance.selectedObj = obj;
+		Instance.alertListeners(new GameEvent(GameEvent.SELECTION_CHANGED));
+	}
+	
+	public static Selectable getSelectedObj() {
+		return Instance.selectedObj;
 	}
 	
 	private GameManager() 

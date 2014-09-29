@@ -17,13 +17,6 @@ public class Cruiser extends Ship {
 		this._shipName = "Cruiser";
 		this._speed = 2;
 		this._tier = 4;
-		
-		try{
-			this._icon = ImageIO.read(getClass().getResource("/resources/Cruiser.png"));
-		} catch (IOException e) {
-			e.printStackTrace();
-			this._icon = null;
-		}
 	}
 	
 	@Override
@@ -36,5 +29,16 @@ public class Cruiser extends Ship {
 	@Override
 	public boolean canUpgrade() {
 		return true;
+	}
+
+	@Override
+	protected void loadIcon() {
+		try{
+			this._icon = ImageIO.read(getClass().getResource("/resources/Cruiser.png"));
+		} catch (IOException e) {
+			e.printStackTrace();
+			this._icon = null;
+		}
+		_selectedImage = _icon;
 	}
 }

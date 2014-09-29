@@ -66,7 +66,7 @@ public class TurnManager {
 			return;
 		currentPlayer++;
 		resetTempValues();
-		GameManager.selectedObj = null;
+		GameManager.selectObj(null);
 		if(currentPlayer > numPlayers) {
 			endRound();
 			currentPlayer = 1;
@@ -134,21 +134,21 @@ public class TurnManager {
 	public static void setPlayerData(String[] names, Color[] colors, boolean[] isAi) {
 		for(int i = 0; i < names.length && i < colors.length && i < players.size(); i++) {
 			Player p = players.get(i);
-			p.AssociatedColor = colors[i];
+			p.setColor(colors[i]);
 			p.Name = names[i];
 			p.setAI(isAi[i]);
 		}
 	}
 	
 	public static boolean isReachable(Location l) {
-		if(GameManager.selectedObj instanceof Ship) {
+		if(GameManager.getSelectedObj() instanceof Ship) {
 			tempSelectedLoc = null;
-			if(Location.distance(((Ship)(GameManager.selectedObj)).getLoc(), l) <= ((Ship)(GameManager.selectedObj)).getSpeed()) {
+			if(Location.distance(((Ship)(GameManager.getSelectedObj())).getLoc(), l) <= ((Ship)(GameManager.getSelectedObj())).getSpeed()) {
 				return true;
 			}
-		} else if(GameManager.selectedObj instanceof Location) {
-			if(GameManager.selectedObj != tempSelectedLoc) {
-				Ship[] ships = ((Location)(GameManager.selectedObj)).getOccupants();
+		} else if(GameManager.getSelectedObj() instanceof Location) {
+			if(GameManager.getSelectedObj() != tempSelectedLoc) {
+				Ship[] ships = ((Location)(GameManager.getSelectedObj())).getOccupants();
 				maxSpeed = Float.MAX_VALUE;
 				for(int i = 0; i < ships.length; i++) {
 					if(ships[i].getLoyalty() == currentPlayer && ships[i].getSpeed() < maxSpeed) {
@@ -158,9 +158,9 @@ public class TurnManager {
 				if(maxSpeed >= Float.MAX_VALUE) {
 					maxSpeed = 0.0f;
 				}
-				tempSelectedLoc = (Location)(GameManager.selectedObj);
+				tempSelectedLoc = (Location)(GameManager.getSelectedObj());
 			}
-			if(Location.distance((Location)(GameManager.selectedObj), l) <= maxSpeed) {
+			if(Location.distance((Location)(GameManager.getSelectedObj()), l) <= maxSpeed) {
 				return true;
 			}
 		}
@@ -169,10 +169,10 @@ public class TurnManager {
 
 	public static void setPlayerColor(int player, Color newColor) {
 		if(newColor != null)
-			players.get(player - 1).AssociatedColor = newColor;
+			players.get(player - 1).setColor(newColor);
 	}
 	
 	public static Color getPlayerColor(int player) {
-		return players.get(player - 1).AssociatedColor;
+		return players.get(player - 1).getColor();
 	}
 }

@@ -18,6 +18,7 @@ import ISectors.engine.TurnManager;
 public class BattleWindow extends JFrame implements ActionListener, GameEventListener {	
 	private static final long serialVersionUID = 5149958171543488559L;
 	private BattleMap m;
+	private InfoPanel _infoPanel;
 	/*
 	 * This class will eventually contain other information, such as info panels, and data panels.
 	 * This will also control switching between different menus...Maybe.
@@ -97,6 +98,10 @@ public class BattleWindow extends JFrame implements ActionListener, GameEventLis
 		});
 		
 		pack();
+
+		_infoPanel = new InfoPanel(this);
+		_infoPanel.setLocation(this.getLocation().x + this.getWidth(), this.getLocation().y);
+		_infoPanel.setVisible(true);
 	}
 	
 	
@@ -223,6 +228,7 @@ public class BattleWindow extends JFrame implements ActionListener, GameEventLis
 		
 		JScrollPane jspane = new JScrollPane(playerPane);
 		jspane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		jspane.setPreferredSize(new Dimension(250, 100));
 		
 		Integer[] choices = {2, 3, 4, 5, 6, 7, 8, 9, 10};
 		playerSelect = new JComboBox<Integer>(choices);
@@ -298,6 +304,7 @@ public class BattleWindow extends JFrame implements ActionListener, GameEventLis
 		JCheckBox[] PlayerAI = new JCheckBox[nPlayers];
 		PlayerAIs = new boolean[nPlayers];
 		Color[] recColors = {Color.blue, Color.red, Color.green, Color.yellow, Color.white, Color.cyan, Color.orange, Color.lightGray, Color.magenta, Color.pink};
+		
 		
 		for(int i = 0; i < nPlayers; i++) {
 			JPanel panel = new JPanel();
@@ -393,17 +400,18 @@ public class BattleWindow extends JFrame implements ActionListener, GameEventLis
 				int nPlayers = (Integer)(playerSelect.getSelectedItem());
 				int nPlanets = Integer.parseInt(txtPlanets.getText());
 				GameManager.NewGame(GameManager.GameType.LOCAL,  GameManager.StringToMode((String)gameSelect.getSelectedItem()), null, nPlayers, nPlanets, nRows, nCols);
-				BattleMap.Instance.loadBattleMap(nRows, nCols);
 				String[] names = new String[nPlayers];
 				for(int i = 0; i < nPlayers; i++) {
 					names[i] = playerNames[i].getText();
 				}
 				TurnManager.setPlayerData(names, PlayerColors, PlayerAIs);
+				BattleMap.Instance.loadBattleMap(nRows, nCols);
 			} else if(modeSelect.getSelectedItem() == "ONLINE") {
 				System.out.println("Connect to online game?");
 			}
 			dialog.setVisible(false);
 			dialog.dispose();
+			BattleMap.Instance.startGame();
 		} else if(e.getSource() == buttons[1]) {
 			dialog.setVisible(false);
 			dialog.dispose();

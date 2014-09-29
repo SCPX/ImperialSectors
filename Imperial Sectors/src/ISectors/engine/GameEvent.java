@@ -7,6 +7,7 @@ package ISectors.engine;
  */
 public class GameEvent {
 	public static final int GAME_OVER = 0;
+	public static final int SELECTION_CHANGED = 1;
 	private int eventType;
 	
 	public GameEvent(int eventType) {

@@ -19,13 +19,6 @@ public class ScoutShip extends Ship {
 		this._shipName = "Scout";
 		this._speed = 3;
 		this._tier = 1;
-		
-		try{
-			this._icon = ImageIO.read(getClass().getResource("/resources/Scout.png"));
-		} catch (IOException e) {
-			e.printStackTrace();
-			this._icon = null;
-		}
 	}
 	
 	@Override
@@ -38,6 +31,17 @@ public class ScoutShip extends Ship {
 	@Override
 	public boolean canUpgrade() {
 		return true;
+	}
+
+	@Override
+	protected void loadIcon() {
+		try{
+			this._icon = ImageIO.read(getClass().getResource("/resources/Scout.png"));
+		} catch (IOException e) {
+			e.printStackTrace();
+			this._icon = null;
+		}
+		_selectedImage = _icon;
 	}
 
 }

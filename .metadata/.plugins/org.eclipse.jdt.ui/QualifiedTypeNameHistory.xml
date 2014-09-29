@@ -1,18 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <qualifiedTypeNameHistroy>
-<fullyQualifiedTypeName name="java.awt.BorderLayout"/>
-<fullyQualifiedTypeName name="java.awt.Graphics"/>
 <fullyQualifiedTypeName name="java.awt.Component"/>
 <fullyQualifiedTypeName name="java.awt.event.MouseListener"/>
 <fullyQualifiedTypeName name="java.awt.GridLayout"/>
-<fullyQualifiedTypeName name="java.awt.Dimension"/>
 <fullyQualifiedTypeName name="java.awt.Insets"/>
-<fullyQualifiedTypeName name="java.awt.Rectangle"/>
 <fullyQualifiedTypeName name="javax.swing.BoxLayout"/>
 <fullyQualifiedTypeName name="javax.swing.JPanel"/>
 <fullyQualifiedTypeName name="javax.swing.Icon"/>
 <fullyQualifiedTypeName name="java.io.InputStream"/>
-<fullyQualifiedTypeName name="java.awt.Image"/>
 <fullyQualifiedTypeName name="ISectors.ships.CapitalShip"/>
 <fullyQualifiedTypeName name="java.net.URL"/>
 <fullyQualifiedTypeName name="java.io.File"/>
@@ -43,14 +38,26 @@
 <fullyQualifiedTypeName name="java.awt.image.BufferedImage"/>
 <fullyQualifiedTypeName name="java.text.NumberFormat"/>
 <fullyQualifiedTypeName name="javax.swing.text.NumberFormatter"/>
-<fullyQualifiedTypeName name="ISectors.engine.Location"/>
 <fullyQualifiedTypeName name="ISectors.engine.GameManager.GameModes"/>
 <fullyQualifiedTypeName name="ISectors.engine.GameManager.GameType"/>
-<fullyQualifiedTypeName name="java.util.ArrayList"/>
-<fullyQualifiedTypeName name="ISectors.ships.Ship"/>
-<fullyQualifiedTypeName name="ISectors.planets.Planet"/>
-<fullyQualifiedTypeName name="ISectors.engine.TurnManager"/>
 <fullyQualifiedTypeName name="java.awt.Color"/>
 <fullyQualifiedTypeName name="ISectors.view.BattleWindow"/>
 <fullyQualifiedTypeName name="java.awt.event.ItemListener"/>
+<fullyQualifiedTypeName name="java.util.ArrayList"/>
+<fullyQualifiedTypeName name="ISectors.engine.GameEventListener"/>
+<fullyQualifiedTypeName name="javax.swing.JFrame"/>
+<fullyQualifiedTypeName name="ISectors.engine.Selectable"/>
+<fullyQualifiedTypeName name="java.awt.Rectangle"/>
+<fullyQualifiedTypeName name="java.awt.Image"/>
+<fullyQualifiedTypeName name="java.awt.Dimension"/>
+<fullyQualifiedTypeName name="ISectors.engine.Location"/>
+<fullyQualifiedTypeName name="ISectors.ships.Ship"/>
+<fullyQualifiedTypeName name="ISectors.planets.Planet"/>
+<fullyQualifiedTypeName name="ISectors.engine.TurnManager"/>
+<fullyQualifiedTypeName name="ISectors.engine.Orders"/>
+<fullyQualifiedTypeName name="java.awt.Frame"/>
+<fullyQualifiedTypeName name="java.awt.Dialog"/>
+<fullyQualifiedTypeName name="java.awt.Window"/>
+<fullyQualifiedTypeName name="java.awt.Graphics"/>
+<fullyQualifiedTypeName name="ISectors.engine.GameManager"/>
 </qualifiedTypeNameHistroy>

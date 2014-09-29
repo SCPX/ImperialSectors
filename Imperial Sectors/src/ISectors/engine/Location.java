@@ -3,6 +3,7 @@ package ISectors.engine;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Graphics;
+import java.awt.Image;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
@@ -60,7 +61,7 @@ public class Location extends Component implements Selectable {
 	public void paint(Graphics g) {
 		Rectangle bounds = this.getBounds();
 		if(TurnManager.isLocationVisible(this) && ISectors.view.BattleMap.displayMap) { // Location is not in fog of war.
-			if(GameManager.selectedObj != null && GameManager.selectedObj.getSelectedLoc() != this && TurnManager.isReachable(this)) { // This location is within range of the selected ship without being the selected location itself.
+			if(GameManager.getSelectedObj() != null && GameManager.getSelectedObj().getSelectedLoc() != this && TurnManager.isReachable(this)) { // This location is within range of the selected ship without being the selected location itself.
 				g.setColor(Color.blue);
 				g.fillRect(bounds.x + border, bounds.y + border, bounds.width - (2 * border), bounds.height - (2 * border));
 			} else { // Location is not within range of any selected ship, if there are any selected ships.
@@ -100,16 +101,22 @@ public class Location extends Component implements Selectable {
 				}
 			}
 			
-			if(GameManager.selectedObj != null && GameManager.selectedObj.getSelectedLoc() == this) { // This is the selected location. Draw selection border
+			if(GameManager.getSelectedObj() != null && GameManager.getSelectedObj().getSelectedLoc() == this) { // This is the selected location. Draw selection border
 				g.setColor(Color.yellow);
 				for(int i = 0; i < borderThickness; i++) {
 					g.drawRect(bounds.x + i, bounds.y + i, bounds.width - (2 * i), bounds.height - (2 * i));
 				}
 			}
 		} else { // Location is a part of the fog of war.
-			if(GameManager.selectedObj != null && GameManager.selectedObj.getSelectedLoc() != this && TurnManager.isReachable(this)) { // Location is within travel range of selected ship.
-				g.setColor(Color.blue);
-				g.fillRect(bounds.x + border, bounds.y + border, bounds.width - (2 * border), bounds.height - (2 * border));
+			if(GameManager.getSelectedObj() != null && GameManager.getSelectedObj().getSelectedLoc() != this && TurnManager.isReachable(this)) { // Location is within travel range of selected ship.
+				if((GameManager.getSelectedObj() instanceof Ship && ((Ship)(GameManager.getSelectedObj())).getLoyalty() != TurnManager.currentPlayer) || 
+						(GameManager.getSelectedObj() instanceof Planet && ((Planet)(GameManager.getSelectedObj())).getAlliance() != TurnManager.currentPlayer)) {
+					g.setColor(Color.DARK_GRAY);
+					g.fillRect(bounds.x, bounds.y, bounds.width, bounds.height);
+				} else {
+					g.setColor(Color.blue);
+					g.fillRect(bounds.x + border, bounds.y + border, bounds.width - (2 * border), bounds.height - (2 * border));
+				}
 			} else { 
 				g.setColor(Color.DARK_GRAY);
 				g.fillRect(bounds.x, bounds.y, bounds.width, bounds.height);
@@ -152,7 +159,11 @@ public class Location extends Component implements Selectable {
 	}
 	
 	public boolean isEmptyOrInvisible() {
-		return _occupants.isEmpty() || !TurnManager.isLocationVisible(this);
+		return (_occupants.isEmpty() && _planet == null) || !TurnManager.isLocationVisible(this);
+	}
+	
+	public boolean isInvisible() {
+		return !TurnManager.isLocationVisible(this);
 	}
 	
 	public boolean IsEmpty() {
@@ -195,14 +206,11 @@ public class Location extends Component implements Selectable {
 	}
 	
 	public Ship[] getOccupants() {
-		if(_occupants.size() > 0) {
-			Ship[] s = new Ship[_occupants.size()];
-			for(int i = 0; i < _occupants.size(); i++) {
-				s[i] = _occupants.get(i);
-			}
-			return s;
+		Ship[] s = new Ship[_occupants.size()];
+		for(int i = 0; i < _occupants.size(); i++) {
+			s[i] = _occupants.get(i);
 		}
-		return null;
+		return s;
 	}
 	
 	public void assignOrder(Orders order, Location target) {
@@ -383,5 +391,10 @@ public class Location extends Component implements Selectable {
 	
 	public boolean isConflicted() {
 		return conflicted;
+	}
+
+	@Override
+	public Image getSelectedImage() {
+		return null;
 	}
 }

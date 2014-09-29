@@ -1,6 +1,7 @@
 package ISectors.ships;
 
 import java.awt.Color;
+import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 
@@ -24,6 +25,7 @@ public abstract class Ship implements Selectable {
 		protected String _shipName; // Stores the name of the type of ship.
 		private boolean _created; // Stores whether or not the unit has been created yet.
 		protected BufferedImage _icon = null; // The image used to represent this ship.
+		protected BufferedImage _selectedImage = null;
 		private boolean _colored = false; // Used to determine if the icon has been recolored or not.
 
 		// Order Data
@@ -68,6 +70,8 @@ public abstract class Ship implements Selectable {
 		{
 			this._location = location;
 			TurnManager.getPlayer(_player).addShip(this);
+			this.loadIcon();
+			ColorImage(TurnManager.getPlayerColor(_player));
 			_created = true;
 		}
 		
@@ -89,7 +93,7 @@ public abstract class Ship implements Selectable {
 		 * Attempts to destroy the enemy ship. In failing, will move to nearest location to enemy.
 		 * @param the target location where the enemy resides.
 		 */
-		protected void Attack(Location destination)
+/*		protected void Attack(Location destination)
 		{
 			if(destination == null || destination.getOccupants() == null) return;
 			
@@ -110,7 +114,7 @@ public abstract class Ship implements Selectable {
 //					MoveTo(newLoc, false);
 //				}
 //			}
-		}
+		}//*/
 		
 		/**
 		 * When an enemy is attacking this ship, it must defend from the attack.
@@ -131,13 +135,49 @@ public abstract class Ship implements Selectable {
 			}
 		}
 		
-/*		public void leaveFleet() {
-			_fleet = null;
+		/**
+		 * Loads the icon and selectedImage for the ship. 
+		 * This is called upon ship construction and every time 
+		 * the icon is changed. 
+		 * Use this to set the _icon and _selectedImage variable.
+		 */
+		protected abstract void loadIcon();
+		
+		public void reloadIcon() {
+			/*
+			 * I would like to try and optimize this at some point. 
+			 * If we can prevent from having to store two different 
+			 * BufferedImages, that would be better. Especially, 
+			 * given the limited memory that mobile devices have.
+			 */
+			loadIcon();
+			_colored = false;
+			ColorImage(TurnManager.getPlayerColor(_player));
+//			_coloredIcon = null;
 		}
 		
-		public void joinFleet(Fleet f) {
-			_fleet = f;
-		}*/
+		private void ColorImage(Color IconColor) {
+//			_coloredIcon = new BufferedImage(_icon.getWidth(), _icon.getHeight(), _icon.getType());
+			for(int y = 0; y < _icon.getHeight(); y++) {
+				for(int x = 0; x < _icon.getWidth(); x++) {
+					Color pixel = new Color(_icon.getRGB(x, y), true);
+					
+					if(pixel.getAlpha() > 0) {
+						float[] color1components = pixel.getRGBComponents(null);
+						float[] color2components = IconColor.getRGBColorComponents(null);
+						float[] newColorComponents = new float[3];
+						for(int component = 0; component < 3; component++) {
+							newColorComponents[component] = color1components[component] * color2components[component];
+						}
+						Color newColor;
+						newColor = new Color(newColorComponents[0], newColorComponents[1], newColorComponents[2], color1components[3]);
+
+						_icon.setRGB(x, y, newColor.getRGB());
+					} 
+				}
+			}
+			_colored = true;
+		}
 		
 		/**
 		 * Retrieves the icon representation of this ship for GUI purposes.
@@ -146,41 +186,22 @@ public abstract class Ship implements Selectable {
 		 */
 		public BufferedImage getShipImage() {
 			if(_icon == null) {
-				BufferedImage icon;
 				try{
-					icon = ImageIO.read(getClass().getResource("/resources/Ship.png"));
+					_icon = ImageIO.read(getClass().getResource("/resources/Ship.png"));
 				} catch(IOException e) {
 					System.err.println("Could not find Ship.png!");
 					e.printStackTrace();
-					icon = null;
+					_icon = null;
+					return null;
 				}
-				return icon;
-			}
+				_colored = false;
+			} 
 
-			if(!_colored) {
-				Color playerColor = TurnManager.getPlayerColor(_player);
-				for(int y = 0; y < _icon.getHeight(); y++) {
-					for(int x = 0; x < _icon.getWidth(); x++) {
-						Color pixel = new Color(_icon.getRGB(x, y), true);
-						
-						if(pixel.getAlpha() > 0) {
-							float[] color1components = pixel.getRGBComponents(null);
-							float[] color2components = playerColor.getRGBColorComponents(null);
-							float[] newColorComponents = new float[3];
-							for(int component = 0; component < 3; component++) {
-								newColorComponents[component] = color1components[component] * color2components[component];
-							}
-							Color newColor;
-							newColor = new Color(newColorComponents[0], newColorComponents[1], newColorComponents[2], color1components[3]);
-
-							_icon.setRGB(x, y, newColor.getRGB());
-						} 
-					}
-				}
-				_colored = true;
+			if(!_colored) { //  || _coloredIcon == null
+				ColorImage(TurnManager.getPlayerColor(_player));
 			}
 			// TODO: Rotate ship image
-			return _icon;
+			return _icon; //*/
 		}
 		
 		public static BufferedImage getSquadImage(){
@@ -193,6 +214,10 @@ public abstract class Ship implements Selectable {
 				icon = null;
 			}
 			return icon;
+		}
+		
+		public Image getSelectedImage() {
+			return _selectedImage;
 		}
 		
 		/**

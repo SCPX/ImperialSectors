@@ -28,13 +28,6 @@ public class CapitalShip extends Ship {
 		this._speed = 1;
 		this._tier = 0;
 
-		try{
-			this._icon = ImageIO.read(getClass().getResource("/resources/CapitalShip.png"));
-		} catch (IOException e) {
-			e.printStackTrace();
-			this._icon = null;
-		}
-		
 		_availableOrders = new Orders[4];
 		_availableOrders[0] = Orders.MOVE;
 		_availableOrders[1] = Orders.STANDBY;
@@ -111,6 +104,18 @@ public class CapitalShip extends Ship {
 	@Override
 	public boolean canUpgrade() {
 		return false;
+	}
+
+	@Override
+	protected void loadIcon() {
+		try{
+			this._icon = ImageIO.read(getClass().getResource("/resources/CapitalShip.png"));
+		} catch (IOException e) {
+			e.printStackTrace();
+			this._icon = null;
+		}
+		
+		_selectedImage = _icon;
 	}
 
 }

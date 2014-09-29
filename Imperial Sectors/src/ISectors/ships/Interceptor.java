@@ -19,13 +19,6 @@ public class Interceptor extends Ship {
 		this._shipName = "Interceptor";
 		this._speed = 4;
 		this._tier = 2;
-
-		try{
-			this._icon = ImageIO.read(getClass().getResource("/resources/Interceptor.png"));
-		} catch (IOException e) {
-			e.printStackTrace();
-			this._icon = null;
-		}
 	}
 	
 	@Override
@@ -38,6 +31,17 @@ public class Interceptor extends Ship {
 	@Override
 	public boolean canUpgrade() {
 		return true;
+	}
+
+	@Override
+	protected void loadIcon() {
+		try{
+			this._icon = ImageIO.read(getClass().getResource("/resources/Interceptor.png"));
+		} catch (IOException e) {
+			e.printStackTrace();
+			this._icon = null;
+		}
+		_selectedImage = _icon;
 	}
 
 }

@@ -22,13 +22,6 @@ public class Battleship extends Ship {
 		this._shipName = "Battleship";
 		this._speed = 1;
 		this._tier = 5;
-		
-		try{
-			this._icon = ImageIO.read(getClass().getResource("/resources/Battleship.png"));
-		} catch (IOException e) {
-			e.printStackTrace();
-			this._icon = null;
-		}
 	}
 	
 	@Override
@@ -40,6 +33,17 @@ public class Battleship extends Ship {
 	@Override
 	public boolean canUpgrade() {
 		return false;
+	}
+
+	@Override
+	protected void loadIcon() {
+		try{
+			this._icon = ImageIO.read(getClass().getResource("/resources/Battleship.png"));
+		} catch (IOException e) {
+			e.printStackTrace();
+			this._icon = null;
+		}
+		_selectedImage = _icon;
 	}
 
 }

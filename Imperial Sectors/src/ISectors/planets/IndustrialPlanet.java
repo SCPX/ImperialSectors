@@ -1,5 +1,8 @@
 package ISectors.planets;
 
+import java.awt.Image;
+
+import javax.imageio.ImageIO;
 import javax.swing.JOptionPane;
 
 import ISectors.engine.Location;
@@ -54,6 +57,15 @@ public class IndustrialPlanet extends Planet {
 			if(IsValidOrder(order)) 
 				clearOrder();
 			_order = order;
+		}
+	}
+	
+	@Override
+	public Image getSelectedImage() {
+		try{
+			return ImageIO.read(getClass().getResource("/resources/Planet.png"));
+		} catch(Exception e) {
+			return null;
 		}
 	}
 	

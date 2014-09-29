@@ -1,5 +1,6 @@
 package ISectors.planets;
 
+import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 
@@ -78,6 +79,10 @@ public abstract class Planet implements Selectable {
 		return _availableOrders;
 	}
 	
+	public Orders getCurrentOrder() {
+		return _order;
+	}
+	
 	public BufferedImage getIcon() {
 		if(_icon == null) {
 			try{
@@ -94,6 +99,10 @@ public abstract class Planet implements Selectable {
 	
 	public Location getSelectedLoc() {
 		return this._location;
+	}
+	
+	public Image getSelectedImage() {
+		return null;
 	}
 	
 	public boolean canBeOrdered() {
